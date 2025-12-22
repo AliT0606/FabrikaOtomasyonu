@@ -55,7 +55,6 @@ C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\Sys
 C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.Pdf.v24.1.Core.xml
 C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.Pdf.v24.1.Drawing.xml
 C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fabrika-Otomasyonu.csproj.AssemblyReference.cache
-C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fabrika-Otomasyonu.exe.config
 C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fabrika_Otomasyonu.LoginScreen.resources
 C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fabrika_Otomasyonu.Properties.Resources.resources
 C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fabrika-Otomasyonu.csproj.GenerateResource.cache
@@ -64,3 +63,19 @@ C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fab
 C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fabrika-.C67741C1.Up2Date
 C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fabrika-Otomasyonu.exe
 C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fabrika-Otomasyonu.pdb
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.XtraBars.v24.1.dll
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.XtraGrid.v24.1.dll
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.XtraLayout.v24.1.dll
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.XtraPrinting.v24.1.dll
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.RichEdit.v24.1.Core.dll
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.XtraTreeList.v24.1.dll
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.Office.v24.1.Core.dll
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.XtraBars.v24.1.xml
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.XtraGrid.v24.1.xml
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.XtraLayout.v24.1.xml
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.XtraPrinting.v24.1.xml
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.RichEdit.v24.1.Core.xml
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.XtraTreeList.v24.1.xml
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.Office.v24.1.Core.xml
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fabrika_Otomasyonu.FrmYonetici.resources
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fabrika-Otomasyonu.exe.config
