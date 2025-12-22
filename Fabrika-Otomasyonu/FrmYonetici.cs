@@ -15,23 +15,23 @@ namespace Fabrika_Otomasyonu
         {
             InitializeComponent();
             Veritabani.TablolariKur();
-
             BaslangicAyarlari();
 
-            // Form açılınca İKİ listeyi de doldur
             UrunListesiniYenile();
-            HammaddeListesiniYenile(); // <-- YENİ EKLENDİ
-
+            HammaddeListesiniYenile();
             OlaylariBagla();
         }
 
         private void BaslangicAyarlari()
         {
-            // Ürün Ekleme Kısmı
+            // Butonun mutlaka en üstte görünmesini garantiye al
+            btnUrunKaldir.Visible = true;
+            btnUrunKaldir.BringToFront();
+
+            // Listeler
             cmbHammaddeTur.Properties.Items.Clear();
             cmbHammaddeTur.Properties.Items.AddRange(new object[] { "Deri", "Emitasyon", "Kumaş", "Süet", "Rugan" });
 
-            // Stok Kısmı
             cmbHamTur.Properties.Items.Clear();
             cmbHamTur.Properties.Items.AddRange(new object[] { "Deri", "Emitasyon", "Kumaş", "Süet", "Rugan", "Taban" });
 
@@ -40,8 +40,10 @@ namespace Fabrika_Otomasyonu
             cmbHamBirim.Enabled = false;
         }
 
+        // ... Diğer OlaylariBagla ve Buton metodları AYNI (önceki koddan devam) ...
         private void OlaylariBagla()
         {
+            // (Önceki kodların aynısı...)
             accordionControl1.ElementClick += (s, e) =>
             {
                 if (e.Element.Style == DevExpress.XtraBars.Navigation.ElementStyle.Item)
@@ -49,36 +51,25 @@ namespace Fabrika_Otomasyonu
                     lblBaslik.Text = e.Element.Text;
                     switch (e.Element.Name)
                     {
-                        case "elmUrunler":
-                            navFrameYonetici.SelectedPage = pageUrunler;
-                            UrunListesiniYenile(); // Sayfaya girince yenile
-                            break;
-                        case "elmMakineler":
-                            navFrameYonetici.SelectedPage = pageMakineler;
-                            break;
-                        case "elmHammadde":
-                            navFrameYonetici.SelectedPage = pageHammadde;
-                            HammaddeListesiniYenile(); // Sayfaya girince yenile
-                            break;
-                        case "elmSiparisler":
-                            navFrameYonetici.SelectedPage = pageSiparisler;
-                            break;
+                        case "elmUrunler": navFrameYonetici.SelectedPage = pageUrunler; UrunListesiniYenile(); break;
+                        case "elmMakineler": navFrameYonetici.SelectedPage = pageMakineler; break;
+                        case "elmHammadde": navFrameYonetici.SelectedPage = pageHammadde; HammaddeListesiniYenile(); break;
+                        case "elmSiparisler": navFrameYonetici.SelectedPage = pageSiparisler; break;
                     }
                 }
             };
 
-            // Resim Seçme
+            // ... Diğerlerini yukarıdan kopyala yapıştır yapabilirsin ...
+
             peUrunResim.Click += (s, e) =>
             {
                 using (OpenFileDialog ofd = new OpenFileDialog())
                 {
                     ofd.Filter = "Resim Dosyaları|*.jpg;*.jpeg;*.png;";
-                    if (ofd.ShowDialog() == DialogResult.OK)
-                        peUrunResim.Image = Image.FromFile(ofd.FileName);
+                    if (ofd.ShowDialog() == DialogResult.OK) peUrunResim.Image = Image.FromFile(ofd.FileName);
                 }
             };
 
-            // Akıllı Birim Seçimi
             cmbHamTur.SelectedIndexChanged += (s, e) =>
             {
                 if (cmbHamTur.EditValue == null) return;
@@ -90,64 +81,22 @@ namespace Fabrika_Otomasyonu
             btnRenkEkle.Click += BtnRenkEkle_Click;
             btnUrunKaydet.Click += BtnUrunKaydet_Click;
             btnUrunKaldir.Click += BtnUrunKaldir_Click;
-
-            // Stok Ekleme Butonu
             btnHammaddeEkle.Click += BtnHammaddeEkle_Click;
-
-            gvUrunListesi.FocusedRowChanged += (s, e) => {
-                var row = gvUrunListesi.GetFocusedDataRow();
-                btnUrunKaldir.Visible = (row != null);
-            };
         }
 
-        // --- STOK EKLEME İŞLEMİ (GÜNCELLENDİ) ---
-        private void BtnHammaddeEkle_Click(object sender, EventArgs e)
+        // ... Buton Click Metodları (BtnUrunKaldir_Click vs.) AYNI ...
+        private void BtnUrunKaldir_Click(object sender, EventArgs e)
         {
-            if (cmbHamTur.EditValue == null || string.IsNullOrEmpty(txtHamMiktar.Text))
+            var row = gvUrunListesi.GetFocusedDataRow();
+            if (row == null) { XtraMessageBox.Show("Ürün seçiniz!"); return; }
+
+            if (XtraMessageBox.Show("Silinsin mi?", "Onay", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                XtraMessageBox.Show("Lütfen tür ve miktar giriniz.");
-                return;
-            }
-
-            try
-            {
-                // Miktarı sayıya çevir
-                double miktar = Convert.ToDouble(txtHamMiktar.Text);
-
-                // Veritabanına kaydet (Varsa üstüne ekler, yoksa yeni açar)
-                urunYonetim.HammaddeStokEkle(cmbHamTur.Text, cmbHamBirim.Text, miktar);
-
-                XtraMessageBox.Show("Stok başarıyla güncellendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                // Listeyi Yenile ki ekranda görünsün!
-                HammaddeListesiniYenile();
-
-                // Temizlik
-                txtHamMiktar.Text = "";
-                cmbHamTur.SelectedIndex = -1;
-                cmbHamBirim.SelectedIndex = -1;
-            }
-            catch (Exception ex)
-            {
-                XtraMessageBox.Show("Hata: " + ex.Message);
+                urunYonetim.UrunSil(Convert.ToInt32(row["Id"]));
+                UrunListesiniYenile();
             }
         }
 
-        // --- LİSTELEME METODLARI ---
-        private void UrunListesiniYenile()
-        {
-            gcUrunListesi.DataSource = urunYonetim.UrunleriGetir();
-            gvUrunListesi.BestFitColumns();
-        }
-
-        private void HammaddeListesiniYenile()
-        {
-            // Veritabanından çek ve Grid'e bağla
-            gcHammaddeListesi.DataSource = urunYonetim.HammaddeleriGetir();
-            gvHammaddeListesi.BestFitColumns();
-        }
-
-        // Diğer butonlar aynen kalıyor...
         private void BtnRenkEkle_Click(object sender, EventArgs e)
         {
             if (cmbRenkSec.EditValue == null) { XtraMessageBox.Show("Renk seçiniz!"); return; }
@@ -174,21 +123,23 @@ namespace Fabrika_Otomasyonu
             catch (Exception ex) { XtraMessageBox.Show(ex.Message); }
         }
 
-        private void BtnUrunKaldir_Click(object sender, EventArgs e)
+        private void BtnHammaddeEkle_Click(object sender, EventArgs e)
         {
-            var row = gvUrunListesi.GetFocusedDataRow();
-            if (row == null) return;
-            if (XtraMessageBox.Show("Silinsin mi?", "Onay", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (cmbHamTur.EditValue == null || string.IsNullOrEmpty(txtHamMiktar.Text))
+            { XtraMessageBox.Show("Eksik bilgi!"); return; }
+
+            try
             {
-                urunYonetim.UrunSil(Convert.ToInt32(row["Id"]));
-                UrunListesiniYenile();
+                urunYonetim.HammaddeStokEkle(cmbHamTur.Text, cmbHamBirim.Text, Convert.ToDouble(txtHamMiktar.Text));
+                XtraMessageBox.Show("Stok Güncellendi.");
+                HammaddeListesiniYenile();
+                txtHamMiktar.Text = ""; cmbHamTur.SelectedIndex = -1; cmbHamBirim.SelectedIndex = -1;
             }
+            catch (Exception ex) { XtraMessageBox.Show(ex.Message); }
         }
 
-        private void FormuTemizle()
-        {
-            txtUrunModel.Text = ""; cmbUrunTur.SelectedIndex = -1; cmbHammaddeTur.SelectedIndex = -1;
-            lstEklenenVaryantlar.Items.Clear(); eklenecekVaryantlar.Clear(); peUrunResim.Image = null;
-        }
+        private void UrunListesiniYenile() { gcUrunListesi.DataSource = urunYonetim.UrunleriGetir(); gvUrunListesi.BestFitColumns(); }
+        private void HammaddeListesiniYenile() { gcHammaddeListesi.DataSource = urunYonetim.HammaddeleriGetir(); gvHammaddeListesi.BestFitColumns(); }
+        private void FormuTemizle() { txtUrunModel.Text = ""; cmbUrunTur.SelectedIndex = -1; cmbHammaddeTur.SelectedIndex = -1; lstEklenenVaryantlar.Items.Clear(); eklenecekVaryantlar.Clear(); peUrunResim.Image = null; }
     }
 }
