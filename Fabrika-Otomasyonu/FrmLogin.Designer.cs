@@ -54,7 +54,7 @@
             // 
             // pnlUstToggles
             // 
-            this.pnlUstToggles.Appearance.BackColor = System.Drawing.Color.MidnightBlue;
+            this.pnlUstToggles.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(152)))), ((int)(((byte)(219)))));
             this.pnlUstToggles.Appearance.Options.UseBackColor = true;
             this.pnlUstToggles.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
             this.pnlUstToggles.Controls.Add(this.btnSecimMusteri);
@@ -118,9 +118,8 @@
             // 
             // pageYonetici
             // 
-            this.pageYonetici.Appearance.BackColor = System.Drawing.Color.MidnightBlue;
+            this.pageYonetici.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(44)))), ((int)(((byte)(52)))));
             this.pageYonetici.Appearance.Options.UseBackColor = true;
-            this.pageYonetici.Caption = "pageYonetici";
             this.pageYonetici.Controls.Add(this.groupYonetici);
             this.pageYonetici.Name = "pageYonetici";
             this.pageYonetici.Size = new System.Drawing.Size(450, 410);
@@ -199,9 +198,8 @@
             // 
             // pageMusteri
             // 
-            this.pageMusteri.Appearance.BackColor = System.Drawing.Color.MidnightBlue;
+            this.pageMusteri.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(44)))), ((int)(((byte)(52)))));
             this.pageMusteri.Appearance.Options.UseBackColor = true;
-            this.pageMusteri.Caption = "pageMusteri";
             this.pageMusteri.Controls.Add(this.groupMusteri);
             this.pageMusteri.Name = "pageMusteri";
             this.pageMusteri.Size = new System.Drawing.Size(450, 410);
@@ -269,7 +267,7 @@
             // 
             // btnGirisYap
             // 
-            this.btnGirisYap.Appearance.BackColor = System.Drawing.Color.Cyan;
+            this.btnGirisYap.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(152)))), ((int)(((byte)(219)))));
             this.btnGirisYap.Appearance.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btnGirisYap.Appearance.ForeColor = System.Drawing.Color.MidnightBlue;
             this.btnGirisYap.Appearance.Options.UseBackColor = true;
@@ -286,10 +284,10 @@
             // 
             // LoginScreen
             // 
-            this.Appearance.BackColor = System.Drawing.Color.MidnightBlue;
+            this.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(44)))), ((int)(((byte)(52)))));
             this.Appearance.Options.UseBackColor = true;
             this.Appearance.Options.UseFont = true;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(450, 550);
             this.Controls.Add(this.navFrameLogin);
