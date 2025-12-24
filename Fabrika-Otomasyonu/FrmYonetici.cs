@@ -1,4 +1,5 @@
-﻿using DevExpress.XtraEditors;
+﻿
+using DevExpress.XtraEditors;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,6 +10,7 @@ namespace Fabrika_Otomasyonu
     public partial class FrmYonetici : DevExpress.XtraEditors.XtraForm
     {
         UrunYonetimi urunYonetim = new UrunYonetimi();
+        HammaddeYonetimi hammaddeYonetim = new HammaddeYonetimi();
         List<GeciciVaryant> eklenecekVaryantlar = new List<GeciciVaryant>();
 
         public FrmYonetici()
@@ -130,7 +132,7 @@ namespace Fabrika_Otomasyonu
 
             try
             {
-                urunYonetim.HammaddeStokEkle(cmbHamTur.Text, cmbHamBirim.Text, Convert.ToDouble(txtHamMiktar.Text));
+                hammaddeYonetim.HammaddeStokEkle(cmbHamTur.Text, cmbHamBirim.Text, Convert.ToDouble(txtHamMiktar.Text));
                 XtraMessageBox.Show("Stok Güncellendi.");
                 HammaddeListesiniYenile();
                 txtHamMiktar.Text = ""; cmbHamTur.SelectedIndex = -1; cmbHamBirim.SelectedIndex = -1;
@@ -139,7 +141,7 @@ namespace Fabrika_Otomasyonu
         }
 
         private void UrunListesiniYenile() { gcUrunListesi.DataSource = urunYonetim.UrunleriGetir(); gvUrunListesi.BestFitColumns(); }
-        private void HammaddeListesiniYenile() { gcHammaddeListesi.DataSource = urunYonetim.HammaddeleriGetir(); gvHammaddeListesi.BestFitColumns(); }
+        private void HammaddeListesiniYenile() { gcHammaddeListesi.DataSource = hammaddeYonetim.HammaddeleriGetir(); gvHammaddeListesi.BestFitColumns(); }
         private void FormuTemizle() { txtUrunModel.Text = ""; cmbUrunTur.SelectedIndex = -1; cmbHammaddeTur.SelectedIndex = -1; lstEklenenVaryantlar.Items.Clear(); eklenecekVaryantlar.Clear(); peUrunResim.Image = null; }
     }
 }
