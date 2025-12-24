@@ -41,6 +41,15 @@
             this.cmbUrunTur = new DevExpress.XtraEditors.ComboBoxEdit();
             this.txtUrunModel = new DevExpress.XtraEditors.TextEdit();
             this.pageMakineler = new DevExpress.XtraBars.Navigation.NavigationPage();
+            this.groupArizaBildirim = new DevExpress.XtraEditors.GroupControl();
+            this.btnBildirimGonder = new DevExpress.XtraEditors.SimpleButton();
+            this.memoOzurMesaji = new DevExpress.XtraEditors.MemoEdit();
+            this.cmbSure = new DevExpress.XtraEditors.ComboBoxEdit();
+            this.lblSure = new DevExpress.XtraEditors.LabelControl();
+            this.txtArizaMakine = new DevExpress.XtraEditors.TextEdit();
+            this.lblArizaMakine = new DevExpress.XtraEditors.LabelControl();
+            this.cmbSorunTipi = new DevExpress.XtraEditors.ComboBoxEdit();
+            this.lblSorunTipi = new DevExpress.XtraEditors.LabelControl();
             this.pageHammadde = new DevExpress.XtraBars.Navigation.NavigationPage();
             this.gcHammaddeListesi = new DevExpress.XtraGrid.GridControl();
             this.gvHammaddeListesi = new DevExpress.XtraGrid.Views.Grid.GridView();
@@ -71,6 +80,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.cmbHammaddeTur.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbUrunTur.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtUrunModel.Properties)).BeginInit();
+            this.pageMakineler.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.groupArizaBildirim)).BeginInit();
+            this.groupArizaBildirim.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.memoOzurMesaji.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cmbSure.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtArizaMakine.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cmbSorunTipi.Properties)).BeginInit();
             this.pageHammadde.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gcHammaddeListesi)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gvHammaddeListesi)).BeginInit();
@@ -145,7 +161,7 @@
             // 
             this.elmMakineler.Name = "elmMakineler";
             this.elmMakineler.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
-            this.elmMakineler.Text = "  MAKİNE DURUMU";
+            this.elmMakineler.Text = "  ARIZA VE SORUN BİLDİRİMİ";
             // 
             // elmHammadde
             // 
@@ -188,7 +204,7 @@
             this.pageUrunler.Controls.Add(this.pnlUrunIslemleri);
             this.pageUrunler.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pageUrunler.Name = "pageUrunler";
-            this.pageUrunler.Size = new System.Drawing.Size(691, 448);
+            this.pageUrunler.Size = new System.Drawing.Size(806, 552);
             // 
             // gcUrunListesi
             // 
@@ -199,7 +215,7 @@
             this.gcUrunListesi.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.gcUrunListesi.Name = "gcUrunListesi";
             this.gcUrunListesi.Padding = new System.Windows.Forms.Padding(9, 8, 9, 8);
-            this.gcUrunListesi.Size = new System.Drawing.Size(365, 407);
+            this.gcUrunListesi.Size = new System.Drawing.Size(480, 511);
             this.gcUrunListesi.TabIndex = 0;
             this.gcUrunListesi.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gvUrunListesi});
@@ -228,10 +244,10 @@
             this.btnUrunKaldir.Appearance.Options.UseForeColor = true;
             this.btnUrunKaldir.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
             this.btnUrunKaldir.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnUrunKaldir.Location = new System.Drawing.Point(0, 407);
+            this.btnUrunKaldir.Location = new System.Drawing.Point(0, 511);
             this.btnUrunKaldir.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnUrunKaldir.Name = "btnUrunKaldir";
-            this.btnUrunKaldir.Size = new System.Drawing.Size(365, 41);
+            this.btnUrunKaldir.Size = new System.Drawing.Size(480, 41);
             this.btnUrunKaldir.TabIndex = 1;
             this.btnUrunKaldir.Text = "SEÇİLİ ÜRÜNÜ SİL";
             this.btnUrunKaldir.Visible = false;
@@ -241,11 +257,11 @@
             this.pnlUrunIslemleri.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
             this.pnlUrunIslemleri.Controls.Add(this.groupUrunEkle);
             this.pnlUrunIslemleri.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pnlUrunIslemleri.Location = new System.Drawing.Point(365, 0);
+            this.pnlUrunIslemleri.Location = new System.Drawing.Point(480, 0);
             this.pnlUrunIslemleri.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pnlUrunIslemleri.Name = "pnlUrunIslemleri";
             this.pnlUrunIslemleri.Padding = new System.Windows.Forms.Padding(13, 12, 13, 12);
-            this.pnlUrunIslemleri.Size = new System.Drawing.Size(326, 448);
+            this.pnlUrunIslemleri.Size = new System.Drawing.Size(326, 552);
             this.pnlUrunIslemleri.TabIndex = 2;
             // 
             // groupUrunEkle
@@ -264,7 +280,7 @@
             this.groupUrunEkle.Location = new System.Drawing.Point(13, 12);
             this.groupUrunEkle.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupUrunEkle.Name = "groupUrunEkle";
-            this.groupUrunEkle.Size = new System.Drawing.Size(300, 424);
+            this.groupUrunEkle.Size = new System.Drawing.Size(300, 528);
             this.groupUrunEkle.TabIndex = 0;
             this.groupUrunEkle.Text = "YENİ ÜRÜN KARTI";
             // 
@@ -407,10 +423,127 @@
             // 
             // pageMakineler
             // 
-            this.pageMakineler.Caption = "pageMakineler";
+            this.pageMakineler.Caption = "ARIZA BİLDİRİMİ";
+            this.pageMakineler.Controls.Add(this.groupArizaBildirim);
             this.pageMakineler.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pageMakineler.Name = "pageMakineler";
-            this.pageMakineler.Size = new System.Drawing.Size(691, 448);
+            this.pageMakineler.Size = new System.Drawing.Size(806, 552);
+            // 
+            // groupArizaBildirim
+            // 
+            this.groupArizaBildirim.AppearanceCaption.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.groupArizaBildirim.AppearanceCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(76)))), ((int)(((byte)(60)))));
+            this.groupArizaBildirim.AppearanceCaption.Options.UseFont = true;
+            this.groupArizaBildirim.AppearanceCaption.Options.UseForeColor = true;
+            this.groupArizaBildirim.Controls.Add(this.btnBildirimGonder);
+            this.groupArizaBildirim.Controls.Add(this.memoOzurMesaji);
+            this.groupArizaBildirim.Controls.Add(this.cmbSure);
+            this.groupArizaBildirim.Controls.Add(this.lblSure);
+            this.groupArizaBildirim.Controls.Add(this.txtArizaMakine);
+            this.groupArizaBildirim.Controls.Add(this.lblArizaMakine);
+            this.groupArizaBildirim.Controls.Add(this.cmbSorunTipi);
+            this.groupArizaBildirim.Controls.Add(this.lblSorunTipi);
+            this.groupArizaBildirim.Location = new System.Drawing.Point(50, 30);
+            this.groupArizaBildirim.Name = "groupArizaBildirim";
+            this.groupArizaBildirim.Size = new System.Drawing.Size(600, 500);
+            this.groupArizaBildirim.TabIndex = 0;
+            this.groupArizaBildirim.Text = "⚠️ ARIZA VE SORUN BİLDİRİM PANELİ";
+            // 
+            // btnBildirimGonder
+            // 
+            this.btnBildirimGonder.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(57)))), ((int)(((byte)(43)))));
+            this.btnBildirimGonder.Appearance.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+            this.btnBildirimGonder.Appearance.ForeColor = System.Drawing.Color.White;
+            this.btnBildirimGonder.Appearance.Options.UseBackColor = true;
+            this.btnBildirimGonder.Appearance.Options.UseFont = true;
+            this.btnBildirimGonder.Appearance.Options.UseForeColor = true;
+            this.btnBildirimGonder.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.btnBildirimGonder.Location = new System.Drawing.Point(30, 420);
+            this.btnBildirimGonder.Name = "btnBildirimGonder";
+            this.btnBildirimGonder.Size = new System.Drawing.Size(540, 60);
+            this.btnBildirimGonder.TabIndex = 0;
+            this.btnBildirimGonder.Text = "BİLDİRİMİ YAYINLA";
+            // 
+            // memoOzurMesaji
+            // 
+            this.memoOzurMesaji.Location = new System.Drawing.Point(30, 250);
+            this.memoOzurMesaji.Name = "memoOzurMesaji";
+            this.memoOzurMesaji.Properties.Appearance.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.memoOzurMesaji.Properties.Appearance.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.memoOzurMesaji.Properties.Appearance.Options.UseBackColor = true;
+            this.memoOzurMesaji.Properties.Appearance.Options.UseFont = true;
+            this.memoOzurMesaji.Properties.NullValuePrompt = "Otomatik bilgilendirme mesajı buraya gelecek...";
+            this.memoOzurMesaji.Size = new System.Drawing.Size(540, 150);
+            this.memoOzurMesaji.TabIndex = 1;
+            // 
+            // cmbSure
+            // 
+            this.cmbSure.Location = new System.Drawing.Point(30, 205);
+            this.cmbSure.Name = "cmbSure";
+            this.cmbSure.Properties.Appearance.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.cmbSure.Properties.Appearance.Options.UseFont = true;
+            this.cmbSure.Properties.Items.AddRange(new object[] {
+            "1 Gün",
+            "1-3 Gün",
+            "3-5 Gün",
+            "1 Hafta",
+            "Belirsiz"});
+            this.cmbSure.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
+            this.cmbSure.Size = new System.Drawing.Size(540, 26);
+            this.cmbSure.TabIndex = 2;
+            // 
+            // lblSure
+            // 
+            this.lblSure.Appearance.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblSure.Appearance.Options.UseFont = true;
+            this.lblSure.Location = new System.Drawing.Point(30, 180);
+            this.lblSure.Name = "lblSure";
+            this.lblSure.Size = new System.Drawing.Size(153, 17);
+            this.lblSure.TabIndex = 3;
+            this.lblSure.Text = "Tahmini Çözülme Süresi:";
+            // 
+            // txtArizaMakine
+            // 
+            this.txtArizaMakine.Location = new System.Drawing.Point(30, 140);
+            this.txtArizaMakine.Name = "txtArizaMakine";
+            this.txtArizaMakine.Properties.Appearance.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txtArizaMakine.Properties.Appearance.Options.UseFont = true;
+            this.txtArizaMakine.Properties.NullValuePrompt = "Örn: Kesim Makinesi 2";
+            this.txtArizaMakine.Size = new System.Drawing.Size(540, 26);
+            this.txtArizaMakine.TabIndex = 4;
+            // 
+            // lblArizaMakine
+            // 
+            this.lblArizaMakine.Appearance.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblArizaMakine.Appearance.Options.UseFont = true;
+            this.lblArizaMakine.Location = new System.Drawing.Point(30, 115);
+            this.lblArizaMakine.Name = "lblArizaMakine";
+            this.lblArizaMakine.Size = new System.Drawing.Size(117, 17);
+            this.lblArizaMakine.TabIndex = 5;
+            this.lblArizaMakine.Text = "Arızalı Makine Adı:";
+            // 
+            // cmbSorunTipi
+            // 
+            this.cmbSorunTipi.Location = new System.Drawing.Point(30, 75);
+            this.cmbSorunTipi.Name = "cmbSorunTipi";
+            this.cmbSorunTipi.Properties.Appearance.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.cmbSorunTipi.Properties.Appearance.Options.UseFont = true;
+            this.cmbSorunTipi.Properties.Items.AddRange(new object[] {
+            "Makine Arızası",
+            "Diğer Sorun"});
+            this.cmbSorunTipi.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
+            this.cmbSorunTipi.Size = new System.Drawing.Size(540, 26);
+            this.cmbSorunTipi.TabIndex = 6;
+            // 
+            // lblSorunTipi
+            // 
+            this.lblSorunTipi.Appearance.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblSorunTipi.Appearance.Options.UseFont = true;
+            this.lblSorunTipi.Location = new System.Drawing.Point(30, 50);
+            this.lblSorunTipi.Name = "lblSorunTipi";
+            this.lblSorunTipi.Size = new System.Drawing.Size(119, 17);
+            this.lblSorunTipi.TabIndex = 7;
+            this.lblSorunTipi.Text = "Sorun Türü Seçiniz:";
             // 
             // pageHammadde
             // 
@@ -419,7 +552,7 @@
             this.pageHammadde.Controls.Add(this.pnlHammaddeIslem);
             this.pageHammadde.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pageHammadde.Name = "pageHammadde";
-            this.pageHammadde.Size = new System.Drawing.Size(691, 448);
+            this.pageHammadde.Size = new System.Drawing.Size(806, 552);
             // 
             // gcHammaddeListesi
             // 
@@ -430,7 +563,7 @@
             this.gcHammaddeListesi.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.gcHammaddeListesi.Name = "gcHammaddeListesi";
             this.gcHammaddeListesi.Padding = new System.Windows.Forms.Padding(9, 8, 9, 8);
-            this.gcHammaddeListesi.Size = new System.Drawing.Size(365, 448);
+            this.gcHammaddeListesi.Size = new System.Drawing.Size(480, 552);
             this.gcHammaddeListesi.TabIndex = 0;
             this.gcHammaddeListesi.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gvHammaddeListesi});
@@ -453,11 +586,11 @@
             this.pnlHammaddeIslem.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
             this.pnlHammaddeIslem.Controls.Add(this.groupHammaddeEkle);
             this.pnlHammaddeIslem.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pnlHammaddeIslem.Location = new System.Drawing.Point(365, 0);
+            this.pnlHammaddeIslem.Location = new System.Drawing.Point(480, 0);
             this.pnlHammaddeIslem.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pnlHammaddeIslem.Name = "pnlHammaddeIslem";
             this.pnlHammaddeIslem.Padding = new System.Windows.Forms.Padding(13, 12, 13, 12);
-            this.pnlHammaddeIslem.Size = new System.Drawing.Size(326, 448);
+            this.pnlHammaddeIslem.Size = new System.Drawing.Size(326, 552);
             this.pnlHammaddeIslem.TabIndex = 1;
             // 
             // groupHammaddeEkle
@@ -474,7 +607,7 @@
             this.groupHammaddeEkle.Location = new System.Drawing.Point(13, 12);
             this.groupHammaddeEkle.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupHammaddeEkle.Name = "groupHammaddeEkle";
-            this.groupHammaddeEkle.Size = new System.Drawing.Size(300, 424);
+            this.groupHammaddeEkle.Size = new System.Drawing.Size(300, 528);
             this.groupHammaddeEkle.TabIndex = 0;
             this.groupHammaddeEkle.Text = "STOK GİRİŞ İŞLEMİ";
             // 
@@ -546,7 +679,7 @@
             this.pageSiparisler.Caption = "pageSiparisler";
             this.pageSiparisler.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pageSiparisler.Name = "pageSiparisler";
-            this.pageSiparisler.Size = new System.Drawing.Size(691, 448);
+            this.pageSiparisler.Size = new System.Drawing.Size(806, 552);
             // 
             // FrmYonetici
             // 
@@ -582,6 +715,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.cmbHammaddeTur.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbUrunTur.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtUrunModel.Properties)).EndInit();
+            this.pageMakineler.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.groupArizaBildirim)).EndInit();
+            this.groupArizaBildirim.ResumeLayout(false);
+            this.groupArizaBildirim.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.memoOzurMesaji.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cmbSure.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtArizaMakine.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cmbSorunTipi.Properties)).EndInit();
             this.pageHammadde.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gcHammaddeListesi)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gvHammaddeListesi)).EndInit();
@@ -634,5 +775,16 @@
         private DevExpress.XtraEditors.ComboBoxEdit cmbHamBirim;
         private DevExpress.XtraEditors.TextEdit txtHamMiktar;
         private DevExpress.XtraEditors.SimpleButton btnHammaddeEkle;
+
+        // --- BU KISMI EN ALTA EKLE ---
+        private DevExpress.XtraEditors.GroupControl groupArizaBildirim;
+        private DevExpress.XtraEditors.SimpleButton btnBildirimGonder;
+        private DevExpress.XtraEditors.MemoEdit memoOzurMesaji;
+        private DevExpress.XtraEditors.ComboBoxEdit cmbSure;
+        private DevExpress.XtraEditors.LabelControl lblSure;
+        private DevExpress.XtraEditors.TextEdit txtArizaMakine;
+        private DevExpress.XtraEditors.LabelControl lblArizaMakine;
+        private DevExpress.XtraEditors.ComboBoxEdit cmbSorunTipi;
+        private DevExpress.XtraEditors.LabelControl lblSorunTipi;
     }
 }

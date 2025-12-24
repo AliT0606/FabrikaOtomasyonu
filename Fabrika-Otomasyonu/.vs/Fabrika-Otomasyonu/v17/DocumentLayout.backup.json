@@ -3,11 +3,15 @@
   "WorkspaceRootPath": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\frmyonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|solutionrelative:frmyonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|c:\\users\\ali\\documents\\github\\fabrikaotomasyonu\\fabrika-otomasyonu\\bildirimyonetimi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|solutionrelative:bildirimyonetimi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|c:\\users\\ali\\documents\\github\\fabrikaotomasyonu\\fabrika-otomasyonu\\frmyonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|c:\\users\\ali\\documents\\github\\fabrikaotomasyonu\\fabrika-otomasyonu\\veritabani.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|solutionrelative:veritabani.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\frmyonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|solutionrelative:frmyonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
@@ -15,16 +19,8 @@
       "RelativeMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|solutionrelative:frmyonetici.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\urunyonetimi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|solutionrelative:urunyonetimi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\hammaddeyonetimi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|solutionrelative:hammaddeyonetimi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\veritabani.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|solutionrelative:veritabani.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\frmyonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0220B087-F15D-4955-B359-133E188A7442}|Fabrika-Otomasyonu.csproj|solutionrelative:frmyonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,7 +30,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -50,25 +46,26 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "HammaddeYonetimi.cs",
-              "DocumentMoniker": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\HammaddeYonetimi.cs",
-              "RelativeDocumentMoniker": "HammaddeYonetimi.cs",
-              "ToolTip": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\HammaddeYonetimi.cs",
-              "RelativeToolTip": "HammaddeYonetimi.cs",
-              "ViewState": "AgIAACUAAAAAAAAAAAAswEsAAAABAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "BildirimYonetimi.cs",
+              "DocumentMoniker": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\BildirimYonetimi.cs",
+              "RelativeDocumentMoniker": "BildirimYonetimi.cs",
+              "ToolTip": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\BildirimYonetimi.cs",
+              "RelativeToolTip": "BildirimYonetimi.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T15:10:59.253Z"
+              "WhenOpened": "2025-12-24T15:48:14.029Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 4,
               "Title": "FrmYonetici.cs",
               "DocumentMoniker": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\FrmYonetici.cs",
               "RelativeDocumentMoniker": "FrmYonetici.cs",
-              "ToolTip": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\FrmYonetici.cs*",
-              "RelativeToolTip": "FrmYonetici.cs*",
-              "ViewState": "AgIAANUAAAAAAAAAAAAswP8AAAABAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\FrmYonetici.cs",
+              "RelativeToolTip": "FrmYonetici.cs",
+              "ViewState": "AgIAAOEAAAAAAAAAAAAmwPIAAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-22T17:32:36.708Z",
               "EditorCaption": ""
@@ -76,43 +73,31 @@
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "UrunYonetimi.cs",
-              "DocumentMoniker": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\UrunYonetimi.cs",
-              "RelativeDocumentMoniker": "UrunYonetimi.cs",
-              "ToolTip": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\UrunYonetimi.cs",
-              "RelativeToolTip": "UrunYonetimi.cs",
-              "ViewState": "AgIAAFcAAAAAAAAAAAAiwGsAAABOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-22T17:32:05.734Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
               "Title": "FrmYonetici.Designer.cs",
               "DocumentMoniker": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\FrmYonetici.Designer.cs",
               "RelativeDocumentMoniker": "FrmYonetici.Designer.cs",
               "ToolTip": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\FrmYonetici.Designer.cs",
               "RelativeToolTip": "FrmYonetici.Designer.cs",
-              "ViewState": "AgIAAOIBAAAAAAAAAAAswNMCAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAJcAAAAAAAAAAAAswKMAAABCAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-22T17:14:01.48Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "FrmYonetici.cs [Tasar\u0131m]",
               "DocumentMoniker": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\FrmYonetici.cs",
               "RelativeDocumentMoniker": "FrmYonetici.cs",
-              "ToolTip": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\FrmYonetici.cs [Tasar\u0131m]*",
-              "RelativeToolTip": "FrmYonetici.cs [Tasar\u0131m]*",
+              "ToolTip": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\FrmYonetici.cs [Tasar\u0131m]",
+              "RelativeToolTip": "FrmYonetici.cs [Tasar\u0131m]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-22T17:09:18.329Z",
               "EditorCaption": " [Tasar\u0131m]"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 1,
               "Title": "Veritabani.cs",
               "DocumentMoniker": "C:\\Users\\Ali\\Documents\\GitHub\\FabrikaOtomasyonu\\Fabrika-Otomasyonu\\Veritabani.cs",
               "RelativeDocumentMoniker": "Veritabani.cs",
@@ -120,7 +105,8 @@
               "RelativeToolTip": "Veritabani.cs",
               "ViewState": "AgIAAHUAAAAAAAAAAAAcwIIAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T16:01:11.11Z"
+              "WhenOpened": "2025-12-21T16:01:11.11Z",
+              "EditorCaption": ""
             }
           ]
         }

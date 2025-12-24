@@ -11,6 +11,7 @@ namespace Fabrika_Otomasyonu
     {
         UrunYonetimi urunYonetim = new UrunYonetimi();
         HammaddeYonetimi hammaddeYonetim = new HammaddeYonetimi();
+        BildirimYonetimi bildirimYonetim = new BildirimYonetimi();
         List<GeciciVaryant> eklenecekVaryantlar = new List<GeciciVaryant>();
 
         public FrmYonetici()
@@ -26,52 +27,148 @@ namespace Fabrika_Otomasyonu
 
         private void BaslangicAyarlari()
         {
-            // Butonun mutlaka en üstte görünmesini garantiye al
-            btnUrunKaldir.Visible = true;
-            btnUrunKaldir.BringToFront();
-
-            // Listeler
-            cmbHammaddeTur.Properties.Items.Clear();
+            // Dropdown (Seçim kutusu) içlerini dolduralım
             cmbHammaddeTur.Properties.Items.AddRange(new object[] { "Deri", "Emitasyon", "Kumaş", "Süet", "Rugan" });
-
-            cmbHamTur.Properties.Items.Clear();
             cmbHamTur.Properties.Items.AddRange(new object[] { "Deri", "Emitasyon", "Kumaş", "Süet", "Rugan", "Taban" });
 
-            cmbHamTur.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
-            cmbHamBirim.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
-            cmbHamBirim.Enabled = false;
+            // --- YENİ AYARLAR ---
+
+            // 1. Mesaj kutusuna elle yazmayı kapat (Sadece kopyalanabilir olur)
+            memoOzurMesaji.Properties.ReadOnly = true;
+
+            // 2. Başlangıçta Makine/Sorun kutusu gizli olsun, seçim yapınca açılsın
+            lblArizaMakine.Visible = false;
+            txtArizaMakine.Visible = false;
+
+            // 3. Panel Sayfa Açılınca Ortada Dursun
+            // Sayfa boyutu değişirse panel hep ortada kalsın diye olay ekliyoruz
+            pageMakineler.SizeChanged += (s, e) =>
+            {
+                groupArizaBildirim.Location = new Point(
+                    (pageMakineler.Width - groupArizaBildirim.Width) / 2,
+                    (pageMakineler.Height - groupArizaBildirim.Height) / 2
+                );
+            };
         }
 
         // ... Diğer OlaylariBagla ve Buton metodları AYNI (önceki koddan devam) ...
         private void OlaylariBagla()
         {
-            // (Önceki kodların aynısı...)
+            // -----------------------------------------------------------
+            // 1. SOL MENÜ GEÇİŞLERİ
+            // -----------------------------------------------------------
             accordionControl1.ElementClick += (s, e) =>
             {
+                // Sadece alt elemanlara (Item) tıklayınca çalışsın
                 if (e.Element.Style == DevExpress.XtraBars.Navigation.ElementStyle.Item)
                 {
-                    lblBaslik.Text = e.Element.Text;
+                    lblBaslik.Text = e.Element.Text; // Başlığı güncelle
+
                     switch (e.Element.Name)
                     {
-                        case "elmUrunler": navFrameYonetici.SelectedPage = pageUrunler; UrunListesiniYenile(); break;
-                        case "elmMakineler": navFrameYonetici.SelectedPage = pageMakineler; break;
-                        case "elmHammadde": navFrameYonetici.SelectedPage = pageHammadde; HammaddeListesiniYenile(); break;
-                        case "elmSiparisler": navFrameYonetici.SelectedPage = pageSiparisler; break;
+                        case "elmUrunler":
+                            navFrameYonetici.SelectedPage = pageUrunler;
+                            UrunListesiniYenile();
+                            break;
+
+                        case "elmMakineler":
+                            // Arıza Paneli Sayfası
+                            navFrameYonetici.SelectedPage = pageMakineler;
+                            // Sayfa açılınca paneli tekrar ortalayalım (garanti olsun)
+                            groupArizaBildirim.Location = new Point(
+                                (pageMakineler.Width - groupArizaBildirim.Width) / 2,
+                                (pageMakineler.Height - groupArizaBildirim.Height) / 2
+                            );
+                            break;
+
+                        case "elmHammadde":
+                            navFrameYonetici.SelectedPage = pageHammadde;
+                            HammaddeListesiniYenile();
+                            break;
+
+                        case "elmSiparisler":
+                            navFrameYonetici.SelectedPage = pageSiparisler;
+                            // SiparisleriYenile(); // Sipariş kodlarını eklediysen aç
+                            break;
                     }
                 }
             };
 
-            // ... Diğerlerini yukarıdan kopyala yapıştır yapabilirsin ...
+            // -----------------------------------------------------------
+            // 2. ARIZA VE SORUN BİLDİRİM PANELİ (GÜNCELLENMİŞ HALİ)
+            // -----------------------------------------------------------
 
+            // A) Sorun Tipi Seçilince: Yazılar ve İpuçları Değişsin
+            cmbSorunTipi.SelectedIndexChanged += (s, e) =>
+            {
+                // Kutuları her halükarda görünür yap
+                lblArizaMakine.Visible = true;
+                txtArizaMakine.Visible = true;
+
+                if (cmbSorunTipi.Text == "Makine Arızası")
+                {
+                    // Makine seçildiyse
+                    lblArizaMakine.Text = "Arızalı Makine Adı:";
+                    txtArizaMakine.Properties.NullValuePrompt = "Örn: Kesim Makinesi 2"; // İpucu
+                }
+                else
+                {
+                    // Diğer sorun seçildiyse
+                    lblArizaMakine.Text = "Sorun Başlığı:"; // Etiket değişti
+                    txtArizaMakine.Properties.NullValuePrompt = ""; // İpucu kalktı
+                }
+
+                // İçini temizle ki eski yazı kalmasın
+                txtArizaMakine.Text = "";
+                OtomatikMesajOlustur(); // Mesajı da güncelle
+            };
+
+            // B) Makine Adı Yazıldıkça veya Süre Seçildikçe Mesajı Güncelle
+            txtArizaMakine.EditValueChanged += (s, e) => OtomatikMesajOlustur();
+            cmbSure.SelectedIndexChanged += (s, e) => OtomatikMesajOlustur();
+
+            // C) BİLDİRİM GÖNDER BUTONU
+            btnBildirimGonder.Click += (s, e) =>
+            {
+                if (string.IsNullOrEmpty(memoOzurMesaji.Text))
+                {
+                    XtraMessageBox.Show("Mesaj içeriği oluşmadı, lütfen bilgileri seçin!", "Uyarı");
+                    return;
+                }
+
+                if (XtraMessageBox.Show("Bu bildirim yayınlansın mı?", "Onay", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    bildirimYonetim.BildirimGonder("⚠️ Fabrika Durum Bildirimi", memoOzurMesaji.Text);
+
+                    XtraMessageBox.Show("Bildirim başarıyla yayınlandı.", "Başarılı");
+
+                    // Temizle
+                    memoOzurMesaji.Text = "";
+                    cmbSure.SelectedIndex = -1;
+                    txtArizaMakine.Text = "";
+                    cmbSorunTipi.SelectedIndex = -1;
+
+                    // Paneli eski haline getir (Gizle)
+                    lblArizaMakine.Visible = false;
+                    txtArizaMakine.Visible = false;
+                }
+            };
+
+            // -----------------------------------------------------------
+            // 3. DİĞER BUTONLAR (ÜRÜN VE HAMMADDE)
+            // -----------------------------------------------------------
+
+            // Resim Seçme
             peUrunResim.Click += (s, e) =>
             {
                 using (OpenFileDialog ofd = new OpenFileDialog())
                 {
-                    ofd.Filter = "Resim Dosyaları|*.jpg;*.jpeg;*.png;";
+                    ofd.Filter = "Resim|*.jpg;*.jpeg;*.png;";
                     if (ofd.ShowDialog() == DialogResult.OK) peUrunResim.Image = Image.FromFile(ofd.FileName);
                 }
             };
 
+            // Hammadde Tür Seçimi (Birim Ayarı)
             cmbHamTur.SelectedIndexChanged += (s, e) =>
             {
                 if (cmbHamTur.EditValue == null) return;
@@ -80,6 +177,7 @@ namespace Fabrika_Otomasyonu
                 cmbHamBirim.Enabled = false;
             };
 
+            // Buton Tıklamalarını Metodlara Bağla
             btnRenkEkle.Click += BtnRenkEkle_Click;
             btnUrunKaydet.Click += BtnUrunKaydet_Click;
             btnUrunKaldir.Click += BtnUrunKaldir_Click;
@@ -138,6 +236,37 @@ namespace Fabrika_Otomasyonu
                 txtHamMiktar.Text = ""; cmbHamTur.SelectedIndex = -1; cmbHamBirim.SelectedIndex = -1;
             }
             catch (Exception ex) { XtraMessageBox.Show(ex.Message); }
+        }
+        private void OtomatikMesajOlustur()
+        {
+            // Verileri al
+            string tip = cmbSorunTipi.Text;
+            string sure = cmbSure.Text;
+            string girilenYazi = txtArizaMakine.Text; // Hem makine adı hem de sorun başlığı burası
+
+            // Eğer tip seçilmediyse işlem yapma
+            if (string.IsNullOrEmpty(tip)) return;
+
+            string mesaj = "";
+
+            if (tip == "Makine Arızası")
+            {
+                // Makine adı boşsa "bir makinemiz", doluysa "'Kesim Makinesi'" yazar
+                string makineAdi = string.IsNullOrEmpty(girilenYazi) ? "bir makinemiz" : $"'{girilenYazi}'";
+
+                mesaj = $"Sayın Müşterimiz,\n\nFabrikamızdaki {makineAdi} üzerinde yaşanan teknik bir arıza sebebiyle üretim planımızda aksamalar olmuştur.\n\nSiparişlerinizin teslimatı tahmini olarak {sure} gecikecektir.\n\nAnlayışınız için teşekkür ederiz.";
+            }
+            else // Diğer Sorun
+            {
+                // BURAYI DÜZELTTİK: Senin yazdığın yazıyı mesaja ekliyoruz
+                // Eğer boşsa "genel aksaklık" yazar, doluysa senin yazdığını (örn: Fabrika genel izin) yazar.
+                string sebep = string.IsNullOrEmpty(girilenYazi) ? "genel teknik aksaklıklar" : $"'{girilenYazi}'";
+
+                mesaj = $"Sayın Müşterimiz,\n\nFabrikamızda yaşanan durum {sebep} nedeniyle üretim süreçlerimizde geçici yavaşlama olmuştur.\n\nSiparişlerinizde {sure} kadar gecikme yaşanabilir.\n\nAnlayışınız için teşekkür ederiz.";
+            }
+
+            // Mesajı kutuya bas
+            memoOzurMesaji.Text = mesaj;
         }
 
         private void UrunListesiniYenile() { gcUrunListesi.DataSource = urunYonetim.UrunleriGetir(); gvUrunListesi.BestFitColumns(); }
