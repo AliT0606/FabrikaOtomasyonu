@@ -37,6 +37,7 @@
             this.cmbRenkSec = new DevExpress.XtraEditors.ComboBoxEdit();
             this.peUrunResim = new DevExpress.XtraEditors.PictureEdit();
             this.btnRenkEkle = new DevExpress.XtraEditors.SimpleButton();
+            this.txtUrunFiyat = new DevExpress.XtraEditors.TextEdit();
             this.cmbHammaddeTur = new DevExpress.XtraEditors.ComboBoxEdit();
             this.cmbUrunTur = new DevExpress.XtraEditors.ComboBoxEdit();
             this.txtUrunModel = new DevExpress.XtraEditors.TextEdit();
@@ -77,6 +78,7 @@
             this.groupVaryant.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cmbRenkSec.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.peUrunResim.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtUrunFiyat.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbHammaddeTur.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbUrunTur.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtUrunModel.Properties)).BeginInit();
@@ -250,7 +252,7 @@
             this.btnUrunKaldir.Size = new System.Drawing.Size(480, 41);
             this.btnUrunKaldir.TabIndex = 1;
             this.btnUrunKaldir.Text = "SEÇİLİ ÜRÜNÜ SİL";
-            this.btnUrunKaldir.Visible = false;
+            this.btnUrunKaldir.Visible = true;
             // 
             // pnlUrunIslemleri
             // 
@@ -268,11 +270,10 @@
             // 
             this.groupUrunEkle.AppearanceCaption.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.groupUrunEkle.AppearanceCaption.ForeColor = System.Drawing.Color.DimGray;
-            this.groupUrunEkle.AppearanceCaption.Options.UseFont = true;
-            this.groupUrunEkle.AppearanceCaption.Options.UseForeColor = true;
             this.groupUrunEkle.Controls.Add(this.btnUrunKaydet);
             this.groupUrunEkle.Controls.Add(this.lstEklenenVaryantlar);
             this.groupUrunEkle.Controls.Add(this.groupVaryant);
+            this.groupUrunEkle.Controls.Add(this.txtUrunFiyat);
             this.groupUrunEkle.Controls.Add(this.cmbHammaddeTur);
             this.groupUrunEkle.Controls.Add(this.cmbUrunTur);
             this.groupUrunEkle.Controls.Add(this.txtUrunModel);
@@ -305,10 +306,10 @@
             // 
             this.lstEklenenVaryantlar.Appearance.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.lstEklenenVaryantlar.Appearance.Options.UseFont = true;
-            this.lstEklenenVaryantlar.Location = new System.Drawing.Point(21, 349);
+            this.lstEklenenVaryantlar.Location = new System.Drawing.Point(21, 380);
             this.lstEklenenVaryantlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lstEklenenVaryantlar.Name = "lstEklenenVaryantlar";
-            this.lstEklenenVaryantlar.Size = new System.Drawing.Size(257, 122);
+            this.lstEklenenVaryantlar.Size = new System.Drawing.Size(257, 100);
             this.lstEklenenVaryantlar.TabIndex = 1;
             // 
             // groupVaryant
@@ -318,7 +319,7 @@
             this.groupVaryant.Controls.Add(this.cmbRenkSec);
             this.groupVaryant.Controls.Add(this.peUrunResim);
             this.groupVaryant.Controls.Add(this.btnRenkEkle);
-            this.groupVaryant.Location = new System.Drawing.Point(21, 154);
+            this.groupVaryant.Location = new System.Drawing.Point(21, 185);
             this.groupVaryant.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupVaryant.Name = "groupVaryant";
             this.groupVaryant.Size = new System.Drawing.Size(257, 187);
@@ -374,9 +375,23 @@
             this.btnRenkEkle.TabIndex = 2;
             this.btnRenkEkle.Text = "EKLE";
             // 
+            // txtUrunFiyat
+            // 
+            this.txtUrunFiyat.Location = new System.Drawing.Point(21, 145);
+            this.txtUrunFiyat.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.txtUrunFiyat.Name = "txtUrunFiyat";
+            this.txtUrunFiyat.Properties.Appearance.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txtUrunFiyat.Properties.Appearance.Options.UseFont = true;
+            this.txtUrunFiyat.Properties.AutoHeight = false;
+            this.txtUrunFiyat.Properties.MaskSettings.Set("MaskManagerType", typeof(DevExpress.Data.Mask.NumericMaskManager));
+            this.txtUrunFiyat.Properties.MaskSettings.Set("mask", "c2");
+            this.txtUrunFiyat.Properties.NullValuePrompt = "Birim Fiyat (TL)";
+            this.txtUrunFiyat.Size = new System.Drawing.Size(257, 29);
+            this.txtUrunFiyat.TabIndex = 3;
+            // 
             // cmbHammaddeTur
             // 
-            this.cmbHammaddeTur.Location = new System.Drawing.Point(21, 114);
+            this.cmbHammaddeTur.Location = new System.Drawing.Point(21, 110);
             this.cmbHammaddeTur.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cmbHammaddeTur.Name = "cmbHammaddeTur";
             this.cmbHammaddeTur.Properties.Appearance.Font = new System.Drawing.Font("Segoe UI", 11F);
@@ -390,11 +405,11 @@
             this.cmbHammaddeTur.Properties.NullValuePrompt = "Ana Malzeme";
             this.cmbHammaddeTur.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
             this.cmbHammaddeTur.Size = new System.Drawing.Size(257, 29);
-            this.cmbHammaddeTur.TabIndex = 3;
+            this.cmbHammaddeTur.TabIndex = 4;
             // 
             // cmbUrunTur
             // 
-            this.cmbUrunTur.Location = new System.Drawing.Point(21, 77);
+            this.cmbUrunTur.Location = new System.Drawing.Point(21, 75);
             this.cmbUrunTur.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cmbUrunTur.Name = "cmbUrunTur";
             this.cmbUrunTur.Properties.Appearance.Font = new System.Drawing.Font("Segoe UI", 11F);
@@ -407,11 +422,11 @@
             this.cmbUrunTur.Properties.NullValuePrompt = "Kategori Seçiniz";
             this.cmbUrunTur.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
             this.cmbUrunTur.Size = new System.Drawing.Size(257, 29);
-            this.cmbUrunTur.TabIndex = 4;
+            this.cmbUrunTur.TabIndex = 5;
             // 
             // txtUrunModel
             // 
-            this.txtUrunModel.Location = new System.Drawing.Point(21, 41);
+            this.txtUrunModel.Location = new System.Drawing.Point(21, 40);
             this.txtUrunModel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtUrunModel.Name = "txtUrunModel";
             this.txtUrunModel.Properties.Appearance.Font = new System.Drawing.Font("Segoe UI", 11F);
@@ -419,7 +434,7 @@
             this.txtUrunModel.Properties.AutoHeight = false;
             this.txtUrunModel.Properties.NullValuePrompt = "Ürün Model Adı";
             this.txtUrunModel.Size = new System.Drawing.Size(257, 29);
-            this.txtUrunModel.TabIndex = 5;
+            this.txtUrunModel.TabIndex = 6;
             // 
             // pageMakineler
             // 
@@ -712,6 +727,7 @@
             this.groupVaryant.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.cmbRenkSec.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.peUrunResim.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtUrunFiyat.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbHammaddeTur.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbUrunTur.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtUrunModel.Properties)).EndInit();
@@ -766,6 +782,7 @@
         private DevExpress.XtraEditors.SimpleButton btnRenkEkle;
         private DevExpress.XtraEditors.ListBoxControl lstEklenenVaryantlar;
         private DevExpress.XtraEditors.SimpleButton btnUrunKaydet;
+        private DevExpress.XtraEditors.TextEdit txtUrunFiyat;
 
         private DevExpress.XtraGrid.GridControl gcHammaddeListesi;
         private DevExpress.XtraGrid.Views.Grid.GridView gvHammaddeListesi;
@@ -776,7 +793,6 @@
         private DevExpress.XtraEditors.TextEdit txtHamMiktar;
         private DevExpress.XtraEditors.SimpleButton btnHammaddeEkle;
 
-        // --- BU KISMI EN ALTA EKLE ---
         private DevExpress.XtraEditors.GroupControl groupArizaBildirim;
         private DevExpress.XtraEditors.SimpleButton btnBildirimGonder;
         private DevExpress.XtraEditors.MemoEdit memoOzurMesaji;

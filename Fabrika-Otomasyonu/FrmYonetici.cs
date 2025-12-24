@@ -19,7 +19,7 @@ namespace Fabrika_Otomasyonu
             InitializeComponent();
             Veritabani.TablolariKur();
             BaslangicAyarlari();
-
+            
             UrunListesiniYenile();
             HammaddeListesiniYenile();
             OlaylariBagla();
@@ -187,13 +187,27 @@ namespace Fabrika_Otomasyonu
         // ... Buton Click Metodları (BtnUrunKaldir_Click vs.) AYNI ...
         private void BtnUrunKaldir_Click(object sender, EventArgs e)
         {
-            var row = gvUrunListesi.GetFocusedDataRow();
-            if (row == null) { XtraMessageBox.Show("Ürün seçiniz!"); return; }
+            var row = gvUrunListesi.GetFocusedDataRow(); // Seçili satırı al
 
-            if (XtraMessageBox.Show("Silinsin mi?", "Onay", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (row == null)
             {
-                urunYonetim.UrunSil(Convert.ToInt32(row["Id"]));
-                UrunListesiniYenile();
+                XtraMessageBox.Show("Lütfen silinecek ürünü listeden seçin!");
+                return;
+            }
+
+            if (XtraMessageBox.Show($"'{row["ModelAd"]}' adlı ürün ve tüm varyantları silinecek. Onaylıyor musunuz?", "Silme Onayı", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                try
+                {
+                    int id = Convert.ToInt32(row["Id"]);
+                    urunYonetim.UrunSil(id); // Veritabanından sil
+                    UrunListesiniYenile(); // Listeyi güncelle
+                    XtraMessageBox.Show("Ürün silindi.");
+                }
+                catch (Exception ex)
+                {
+                    XtraMessageBox.Show("Hata: " + ex.Message);
+                }
             }
         }
 
@@ -209,18 +223,34 @@ namespace Fabrika_Otomasyonu
 
         private void BtnUrunKaydet_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtUrunModel.Text) || cmbUrunTur.EditValue == null || cmbHammaddeTur.EditValue == null)
-            { XtraMessageBox.Show("Eksik bilgi!"); return; }
-
-            if (eklenecekVaryantlar.Count == 0) { XtraMessageBox.Show("Varyant eklemediniz!"); return; }
+            // Kontroller
+            if (string.IsNullOrEmpty(txtUrunModel.Text)) { XtraMessageBox.Show("Model adı boş olamaz!"); return; }
+            if (string.IsNullOrEmpty(txtUrunFiyat.Text)) { XtraMessageBox.Show("Fiyat girmediniz!"); return; }
 
             try
             {
-                urunYonetim.UrunEkle(txtUrunModel.Text, cmbUrunTur.Text, cmbHammaddeTur.Text, eklenecekVaryantlar);
-                XtraMessageBox.Show("Kaydedildi.");
-                FormuTemizle(); UrunListesiniYenile();
+                // Fiyat metnini sayıya çevir (TL işaretini temizler)
+                decimal fiyat = Convert.ToDecimal(txtUrunFiyat.EditValue);
+
+                // Parametreleri gönder
+                urunYonetim.UrunEkle(
+                    txtUrunModel.Text,
+                    cmbUrunTur.Text,
+                    cmbHammaddeTur.Text,
+                    fiyat, // YENİ
+                    eklenecekVaryantlar
+                );
+
+                XtraMessageBox.Show("Ürün başarıyla kaydedildi.");
+
+                // Temizlik ve Yenileme
+                FormuTemizle();
+                UrunListesiniYenile();
             }
-            catch (Exception ex) { XtraMessageBox.Show(ex.Message); }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show("Hata: " + ex.Message);
+            }
         }
 
         private void BtnHammaddeEkle_Click(object sender, EventArgs e)
@@ -269,8 +299,26 @@ namespace Fabrika_Otomasyonu
             memoOzurMesaji.Text = mesaj;
         }
 
-        private void UrunListesiniYenile() { gcUrunListesi.DataSource = urunYonetim.UrunleriGetir(); gvUrunListesi.BestFitColumns(); }
-        private void HammaddeListesiniYenile() { gcHammaddeListesi.DataSource = hammaddeYonetim.HammaddeleriGetir(); gvHammaddeListesi.BestFitColumns(); }
-        private void FormuTemizle() { txtUrunModel.Text = ""; cmbUrunTur.SelectedIndex = -1; cmbHammaddeTur.SelectedIndex = -1; lstEklenenVaryantlar.Items.Clear(); eklenecekVaryantlar.Clear(); peUrunResim.Image = null; }
+        private void UrunListesiniYenile() 
+        { gcUrunListesi.DataSource = urunYonetim.UrunleriGetir(); 
+            gvUrunListesi.BestFitColumns(); 
+        }
+        private void HammaddeListesiniYenile() 
+        { 
+            gcHammaddeListesi.DataSource = hammaddeYonetim.HammaddeleriGetir(); 
+            gvHammaddeListesi.BestFitColumns(); 
+        }
+        private void FormuTemizle()
+        {
+            
+        
+            txtUrunModel.Text = "";
+            txtUrunFiyat.Text = ""; // Fiyatı temizle
+            cmbUrunTur.SelectedIndex = -1;
+            cmbHammaddeTur.SelectedIndex = -1;
+            lstEklenenVaryantlar.Items.Clear();
+            eklenecekVaryantlar.Clear();
+            peUrunResim.Image = null;
+        }
     }
 }

@@ -22,8 +22,15 @@ namespace Fabrika_Otomasyonu
         {
             using (var con = Veritabani.BaglantiGetir())
             {
-                // Join yaparak varyant sayısını da getirebiliriz ama şimdilik basitten gidelim
-                string sql = "SELECT * FROM Urunler ORDER BY Id DESC";
+                // YENİ SQL: Varyant tablosuyla birleştirip renkleri yan yana yazar (Örn: Siyah, Beyaz)
+                string sql = @"
+            SELECT u.Id, u.ModelAd, u.Tur, u.AnaHammadde, u.Fiyat, 
+            IFNULL(GROUP_CONCAT(v.Renk, ', '), 'Renk Yok') as Renkler
+            FROM Urunler u
+            LEFT JOIN UrunVaryant v ON u.Id = v.UrunId
+            GROUP BY u.Id
+            ORDER BY u.Id DESC";
+
                 using (var da = new SQLiteDataAdapter(sql, con))
                 {
                     DataTable dt = new DataTable();
@@ -34,7 +41,7 @@ namespace Fabrika_Otomasyonu
         }
 
         // 2. Yeni Ürün Kaydet (Transaction kullanarak: Hem ürün hem varyantlar tek seferde)
-        public void UrunEkle(string model, string tur, string hammadde, List<GeciciVaryant> varyantlar)
+        public void UrunEkle(string model, string tur, string hammadde, decimal fiyat, List<GeciciVaryant> varyantlar)
         {
             using (var con = Veritabani.BaglantiGetir())
             {
@@ -42,8 +49,8 @@ namespace Fabrika_Otomasyonu
                 {
                     try
                     {
-                        // A) Ana Ürünü Ekle
-                        string sqlUrun = "INSERT INTO Urunler (ModelAd, Tur, AnaHammadde) VALUES (@model, @tur, @ham); SELECT last_insert_rowid();";
+                        // Fiyatı da ekliyoruz
+                        string sqlUrun = "INSERT INTO Urunler (ModelAd, Tur, AnaHammadde, Fiyat) VALUES (@model, @tur, @ham, @fiyat); SELECT last_insert_rowid();";
                         long yeniUrunId;
 
                         using (var cmd = new SQLiteCommand(sqlUrun, con))
@@ -51,10 +58,10 @@ namespace Fabrika_Otomasyonu
                             cmd.Parameters.AddWithValue("@model", model);
                             cmd.Parameters.AddWithValue("@tur", tur);
                             cmd.Parameters.AddWithValue("@ham", hammadde);
-                            yeniUrunId = (long)cmd.ExecuteScalar(); // Eklenen ID'yi al
+                            cmd.Parameters.AddWithValue("@fiyat", fiyat); // Fiyat parametresi
+                            yeniUrunId = (long)cmd.ExecuteScalar();
                         }
 
-                        // B) Varyantları (Renkleri) Ekle
                         string sqlVaryant = "INSERT INTO UrunVaryant (UrunId, Renk, Resim) VALUES (@uid, @renk, @resim)";
                         foreach (var item in varyantlar)
                         {
@@ -66,13 +73,12 @@ namespace Fabrika_Otomasyonu
                                 cmdVar.ExecuteNonQuery();
                             }
                         }
-
-                        transaction.Commit(); // Hata yoksa onayla
+                        transaction.Commit();
                     }
                     catch (Exception)
                     {
-                        transaction.Rollback(); // Hata varsa iptal et
-                        throw; // Hatayı forma fırlat
+                        transaction.Rollback();
+                        throw;
                     }
                 }
             }
