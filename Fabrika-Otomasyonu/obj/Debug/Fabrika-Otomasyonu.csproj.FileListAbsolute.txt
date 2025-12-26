@@ -79,3 +79,4 @@ C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\Dev
 C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\bin\Debug\DevExpress.Office.v24.1.Core.xml
 C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fabrika_Otomasyonu.FrmYonetici.resources
 C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fabrika-Otomasyonu.exe.config
+C:\Users\Ali\Documents\GitHub\FabrikaOtomasyonu\Fabrika-Otomasyonu\obj\Debug\Fabrika_Otomasyonu.FrmMusteri.resources

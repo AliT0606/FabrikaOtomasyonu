@@ -77,7 +77,9 @@ namespace Fabrika_Otomasyonu
             // 2. Müşteri Girişi mi? (Şimdilik boş geçebiliriz veya basit kontrol)
             else if (navFrameLogin.SelectedPage == pageMusteri)
             {
-                XtraMessageBox.Show("Müşteri paneli henüz aktif değil kanka.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                FrmMusteri fr = new FrmMusteri(); // Müşteri panelini oluştur
+                fr.Show();                        // Ekrana getir
+                this.Hide();
             }
         }
 
