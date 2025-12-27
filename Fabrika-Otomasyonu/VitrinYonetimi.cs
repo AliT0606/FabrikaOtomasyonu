@@ -20,15 +20,16 @@ namespace Fabrika_Otomasyonu
                 string sql = "";
 
                 // Alt sorgu ile (SELECT ... LIMIT 1) her ürünün ilk varyant resmini 'KapakResmi' olarak çekiyoruz
+                // Ayrıca artık AnaHammadde (ürünün hammaddesi) alanını da getiriyoruz.
                 if (kategori == "Tümü")
                 {
-                    sql = @"SELECT u.Id, u.ModelAd, u.Tur, u.Fiyat,
+                    sql = @"SELECT u.Id, u.ModelAd, u.Tur, u.Fiyat, u.AnaHammadde,
                            (SELECT v.Resim FROM UrunVaryant v WHERE v.UrunId = u.Id LIMIT 1) as KapakResmi
                            FROM Urunler u ORDER BY u.Id DESC";
                 }
                 else
                 {
-                    sql = @"SELECT u.Id, u.ModelAd, u.Tur, u.Fiyat,
+                    sql = @"SELECT u.Id, u.ModelAd, u.Tur, u.Fiyat, u.AnaHammadde,
                            (SELECT v.Resim FROM UrunVaryant v WHERE v.UrunId = u.Id LIMIT 1) as KapakResmi
                            FROM Urunler u 
                            WHERE u.Tur = @tur
@@ -47,13 +48,10 @@ namespace Fabrika_Otomasyonu
         }
 
         // 3. SEÇİLEN ÜRÜNÜN DETAYLARI (RENK VE RESİMLER)
-        // Sorun muhtemelen buradaydı, burayı sağlama aldık.
         public DataTable UrunDetaylariniGetir(int urunId)
         {
             using (var con = Veritabani.BaglantiGetir())
             {
-                // Sadece Renk ve Resim sütunlarını çekiyoruz
-                // Resim sütunu BLOB olduğu için DataTable bunu byte[] olarak algılar.
                 string sql = "SELECT Renk, Resim FROM UrunVaryant WHERE UrunId = @id";
 
                 using (var da = new SQLiteDataAdapter(sql, con))

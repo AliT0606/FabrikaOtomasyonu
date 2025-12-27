@@ -17,16 +17,18 @@
             DevExpress.XtraGrid.Views.Tile.TileViewItemElement tileViewItemElement1 = new DevExpress.XtraGrid.Views.Tile.TileViewItemElement();
             DevExpress.XtraGrid.Views.Tile.TileViewItemElement tileViewItemElement2 = new DevExpress.XtraGrid.Views.Tile.TileViewItemElement();
             DevExpress.XtraGrid.Views.Tile.TileViewItemElement tileViewItemElement3 = new DevExpress.XtraGrid.Views.Tile.TileViewItemElement();
+            DevExpress.XtraGrid.Views.Tile.TileViewItemElement tileViewItemElement4 = new DevExpress.XtraGrid.Views.Tile.TileViewItemElement();
 
             // GRID SÜTUNLARI VE REPOSITORY
             this.colKapakResmi = new DevExpress.XtraGrid.Columns.TileViewColumn();
             this.colModelAd = new DevExpress.XtraGrid.Columns.TileViewColumn();
+            this.colAnaHammadde = new DevExpress.XtraGrid.Columns.TileViewColumn(); // yeni sütun
             this.colFiyat = new DevExpress.XtraGrid.Columns.TileViewColumn();
             this.colId = new DevExpress.XtraGrid.Columns.TileViewColumn();
 
             this.repoResim = new DevExpress.XtraEditors.Repository.RepositoryItemPictureEdit();
             this.repoBilgi = new DevExpress.XtraEditors.Repository.RepositoryItemMemoEdit();
-            this.repoAdet = new DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit(); // SpinEdit yerine ButtonEdit kullandım, daha temiz durur.
+            this.repoAdet = new DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit();
             this.repoSil = new DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit();
 
             // ANA KONTROLLER
@@ -145,7 +147,7 @@
             this.navFrameMusteri.SelectedPage = this.pageKatalog;
 
             // =================================================================================
-            // SAYFA 1: KATALOG (AYNI KALDI)
+            // SAYFA 1: KATALOG (GÜNCELLENDİ - FLOW WRAP + HAMMADDE ALT SATIRDA)
             // =================================================================================
             this.pnlKatalogUst.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlKatalogUst.Height = 60;
@@ -155,8 +157,12 @@
             this.lblFiltre.Location = new System.Drawing.Point(30, 20);
             this.cmbKategoriFiltre.Location = new System.Drawing.Point(150, 17);
             this.cmbKategoriFiltre.Size = new System.Drawing.Size(200, 26);
-            this.cmbKategoriFiltre.Properties.Items.AddRange(new object[] { "Tümü", "Bot", "Klasik", "Spor", "Terlik", "Çocuk" });
+            this.cmbKategoriFiltre.Properties.Items.Clear();
+            this.cmbKategoriFiltre.Properties.Items.AddRange(new object[] { "Tümü", "Bot", "Spor", "Klasik" });
             this.cmbKategoriFiltre.SelectedIndex = 0;
+            this.cmbKategoriFiltre.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
+            this.cmbKategoriFiltre.Properties.DropDownRows = 6;
+            this.cmbKategoriFiltre.Click += new System.EventHandler(this.cmbKategoriFiltre_Click);
 
             this.pnlKatalogSag.Dock = System.Windows.Forms.DockStyle.Right;
             this.pnlKatalogSag.Width = 320;
@@ -211,41 +217,64 @@
 
             this.gcUrunVitrin.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gcUrunVitrin.MainView = this.tvUrunVitrin;
+            this.gcUrunVitrin.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.tvUrunVitrin });
+
             this.tvUrunVitrin.GridControl = this.gcUrunVitrin;
+            this.tvUrunVitrin.OptionsTiles.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.tvUrunVitrin.OptionsTiles.ColumnCount = 0;
+            this.tvUrunVitrin.OptionsTiles.RowCount = 0;
+            this.tvUrunVitrin.OptionsTiles.ItemSize = new System.Drawing.Size(240, 320);
 
-            this.tvUrunVitrin.OptionsTiles.LayoutMode = DevExpress.XtraGrid.Views.Tile.TileViewLayoutMode.Kanban;
+            // Yan yana dizilip sığmadığında alt satıra geçmesi için:
             this.tvUrunVitrin.OptionsTiles.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.tvUrunVitrin.OptionsTiles.ItemSize = new System.Drawing.Size(220, 320);
-            this.tvUrunVitrin.OptionsTiles.Padding = new System.Windows.Forms.Padding(10);
+            this.tvUrunVitrin.OptionsTiles.RowCount = 0; // Otomatik satır sayısı
+            this.tvUrunVitrin.OptionsTiles.ColumnCount = 0;
+            this.tvUrunVitrin.OptionsTiles.ItemSize = new System.Drawing.Size(240, 320);
+            this.tvUrunVitrin.OptionsTiles.Padding = new System.Windows.Forms.Padding(12);
             this.tvUrunVitrin.OptionsTiles.ItemPadding = new System.Windows.Forms.Padding(10);
-
-            this.tvUrunVitrin.Appearance.ItemNormal.BackColor = System.Drawing.Color.White;
-            this.tvUrunVitrin.Appearance.ItemNormal.BorderColor = System.Drawing.Color.LightGray;
-            this.tvUrunVitrin.Appearance.ItemNormal.Options.UseBackColor = true;
-            this.tvUrunVitrin.Appearance.ItemNormal.Options.UseBorderColor = true;
-
+            // Smooth scroll opsiyonel
+            this.tvUrunVitrin.OptionsBehavior.AllowSmoothScrolling = true;
+            // Görselin Tile içinde düzgün gözükmesi için KapakResmi column'u picture edit ile bağla
             this.colKapakResmi.FieldName = "KapakResmi";
+            this.colKapakResmi.ColumnEdit = this.repoResim; // <- önemli
             this.colKapakResmi.Visible = true;
+
+            // Diğer sütunlar
             this.colModelAd.FieldName = "ModelAd";
             this.colModelAd.Visible = true;
+
+            this.colAnaHammadde.FieldName = "AnaHammadde";
+            this.colAnaHammadde.Visible = true;
+
             this.colFiyat.FieldName = "Fiyat";
             this.colFiyat.Visible = true;
+
             this.colId.FieldName = "Id";
             this.colId.Visible = false;
-            this.tvUrunVitrin.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] { this.colKapakResmi, this.colModelAd, this.colFiyat, this.colId });
 
+            this.tvUrunVitrin.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] { this.colKapakResmi, this.colModelAd, this.colAnaHammadde, this.colFiyat, this.colId });
+
+            // Tile template elements (model adı altında hammaddesi gösterilir)
             tileViewItemElement1.Column = this.colKapakResmi;
             tileViewItemElement1.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.TopCenter;
             tileViewItemElement1.ImageOptions.ImageScaleMode = DevExpress.XtraEditors.TileItemImageScaleMode.ZoomInside;
             tileViewItemElement1.ImageOptions.ImageSize = new System.Drawing.Size(180, 180);
             tileViewItemElement1.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.Manual;
+            tileViewItemElement1.TextLocation = new System.Drawing.Point(0, 0);
 
             tileViewItemElement2.Column = this.colModelAd;
             tileViewItemElement2.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
-            tileViewItemElement2.TextLocation = new System.Drawing.Point(0, 30);
-            tileViewItemElement2.Appearance.Normal.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
+            tileViewItemElement2.TextLocation = new System.Drawing.Point(0, 185);
+            tileViewItemElement2.Appearance.Normal.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             tileViewItemElement2.Appearance.Normal.ForeColor = System.Drawing.Color.DarkSlateGray;
             tileViewItemElement2.Text = "{0}";
+
+            tileViewItemElement4.Column = this.colAnaHammadde;
+            tileViewItemElement4.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
+            tileViewItemElement4.TextLocation = new System.Drawing.Point(0, 208);
+            tileViewItemElement4.Appearance.Normal.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic);
+            tileViewItemElement4.Appearance.Normal.ForeColor = System.Drawing.Color.Gray;
+            tileViewItemElement4.Text = "{0}";
 
             tileViewItemElement3.Column = this.colFiyat;
             tileViewItemElement3.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.BottomCenter;
@@ -253,8 +282,10 @@
             tileViewItemElement3.Appearance.Normal.ForeColor = System.Drawing.Color.FromArgb(242, 122, 26);
             tileViewItemElement3.Text = "{0:C}";
 
+            this.tvUrunVitrin.TileTemplate.Clear();
             this.tvUrunVitrin.TileTemplate.Add(tileViewItemElement1);
             this.tvUrunVitrin.TileTemplate.Add(tileViewItemElement2);
+            this.tvUrunVitrin.TileTemplate.Add(tileViewItemElement4);
             this.tvUrunVitrin.TileTemplate.Add(tileViewItemElement3);
 
             this.pageKatalog.Controls.Add(this.gcUrunVitrin);
@@ -262,7 +293,7 @@
             this.pageKatalog.Controls.Add(this.pnlKatalogUst);
 
             // =================================================================================
-            // SAYFA 2: SEPET (DÜZELTİLDİ - SON HAL)
+            // SAYFA 2: SEPET (UYARI: aynı kalabilir)
             // =================================================================================
             this.pageSepet.Controls.Add(this.gcSepet);
             this.pageSepet.Controls.Add(this.pnlSepetAlt);
@@ -471,7 +502,7 @@
 
         #endregion
 
-        // DEĞİŞKENLER
+        // DEĞİŞKENLER (AnaHammadde eklendi)
         private DevExpress.XtraEditors.PanelControl pnlHeader;
         private DevExpress.XtraEditors.LabelControl lblHeader;
         private DevExpress.XtraBars.Navigation.AccordionControl accordionControl1;
@@ -493,6 +524,7 @@
         private DevExpress.XtraGrid.Views.Tile.TileView tvUrunVitrin;
         private DevExpress.XtraGrid.Columns.TileViewColumn colKapakResmi;
         private DevExpress.XtraGrid.Columns.TileViewColumn colModelAd;
+        private DevExpress.XtraGrid.Columns.TileViewColumn colAnaHammadde; // eklendi
         private DevExpress.XtraGrid.Columns.TileViewColumn colFiyat;
         private DevExpress.XtraGrid.Columns.TileViewColumn colId;
         private DevExpress.XtraEditors.LabelControl lblUrunBaslik;
@@ -512,8 +544,6 @@
         private DevExpress.XtraGrid.Columns.GridColumn colSepetSil;
         private DevExpress.XtraEditors.Repository.RepositoryItemPictureEdit repoResim;
         private DevExpress.XtraEditors.Repository.RepositoryItemMemoEdit repoBilgi;
-
-        // DEĞİŞİKLİK: SpinEdit yerine ButtonEdit
         private DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit repoAdet;
         private DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit repoSil;
 

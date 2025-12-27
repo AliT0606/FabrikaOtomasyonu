@@ -15,9 +15,9 @@ namespace Fabrika_Otomasyonu
     {
         // YÖNETİM SINIFLARI
         VitrinYonetimi vitrinYonetim = new VitrinYonetimi();
-        SiparisYonetimi siparisYonetim = new SiparisYonetimi();
+        SiparisYonetimi siparisYonetimi = new SiparisYonetimi();
 
-        // SEPET LİSTESİ -> BindingList ile Grid ile uyumlu hale getirildi
+        // SEPET LİSTESİ
         BindingList<SepetOgesi> sepetListesi = new BindingList<SepetOgesi>();
 
         // DEĞİŞKENLER
@@ -37,11 +37,13 @@ namespace Fabrika_Otomasyonu
 
         private void BaslangicAyarlari()
         {
+            ConfigureTileView();
+
             // 1. Verileri Yükle
             gcUrunVitrin.DataSource = vitrinYonetim.VitrinListesiGetir();
-            gcSiparisTakip.DataSource = siparisYonetim.SiparisleriGetir();
+            gcSiparisTakip.DataSource = siparisYonetimi.SiparisleriGetir();
 
-            // Sepet grid'i bir kez bağla
+            // Sepet grid'i bağla
             gcSepet.DataSource = sepetListesi;
 
             // 2. Sağ Paneli Temizle
@@ -49,12 +51,76 @@ namespace Fabrika_Otomasyonu
             SepetiGuncelle();
         }
 
+        private void ConfigureTileView()
+        {
+            tvUrunVitrin.BeginUpdate();
+            try
+            {
+                if (!gcUrunVitrin.RepositoryItems.Contains(repoResim))
+                    gcUrunVitrin.RepositoryItems.Add(repoResim);
+
+                colKapakResmi.ColumnEdit = repoResim;
+
+                // LAYOUT AYARLARI
+                tvUrunVitrin.OptionsTiles.Orientation = System.Windows.Forms.Orientation.Vertical;
+                tvUrunVitrin.OptionsTiles.ColumnCount = 0;
+                tvUrunVitrin.OptionsTiles.RowCount = 0;
+                tvUrunVitrin.OptionsTiles.ItemSize = new System.Drawing.Size(240, 340);
+                tvUrunVitrin.OptionsTiles.Padding = new System.Windows.Forms.Padding(12);
+                tvUrunVitrin.OptionsTiles.ItemPadding = new System.Windows.Forms.Padding(8);
+                tvUrunVitrin.OptionsBehavior.AllowSmoothScrolling = true;
+
+                // TASARIM
+                tvUrunVitrin.TileTemplate.Clear();
+
+                // A) RESİM
+                var imgElem = new DevExpress.XtraGrid.Views.Tile.TileViewItemElement();
+                imgElem.Column = colKapakResmi;
+                imgElem.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.TopCenter;
+                imgElem.ImageOptions.ImageScaleMode = DevExpress.XtraEditors.TileItemImageScaleMode.ZoomInside;
+                imgElem.ImageOptions.ImageSize = new System.Drawing.Size(200, 180);
+                imgElem.Text = "";
+                tvUrunVitrin.TileTemplate.Add(imgElem);
+
+                // B) MODEL ADI
+                var modelElem = new DevExpress.XtraGrid.Views.Tile.TileViewItemElement();
+                modelElem.Column = colModelAd;
+                modelElem.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.TopCenter;
+                modelElem.TextLocation = new System.Drawing.Point(0, 185);
+                modelElem.Appearance.Normal.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
+                modelElem.Appearance.Normal.ForeColor = System.Drawing.Color.Black;
+                tvUrunVitrin.TileTemplate.Add(modelElem);
+
+                // C) HAMMADDE
+                var matElem = new DevExpress.XtraGrid.Views.Tile.TileViewItemElement();
+                matElem.Column = colAnaHammadde;
+                matElem.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.TopCenter;
+                matElem.TextLocation = new System.Drawing.Point(0, 210);
+                matElem.Appearance.Normal.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic);
+                matElem.Appearance.Normal.ForeColor = System.Drawing.Color.Gray;
+                matElem.Text = "Malzeme: {0}";
+                tvUrunVitrin.TileTemplate.Add(matElem);
+
+                // D) FİYAT
+                var priceElem = new DevExpress.XtraGrid.Views.Tile.TileViewItemElement();
+                priceElem.Column = colFiyat;
+                priceElem.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.BottomCenter;
+                priceElem.Appearance.Normal.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+                priceElem.Appearance.Normal.ForeColor = System.Drawing.Color.FromArgb(242, 122, 26);
+                priceElem.Text = "{0:C2}";
+                tvUrunVitrin.TileTemplate.Add(priceElem);
+            }
+            finally
+            {
+                tvUrunVitrin.EndUpdate();
+            }
+        }
+
         private void OlaylariBagla()
         {
-            // --- 1. SOL MENÜ GEÇİŞLERİ (GARANTİ YÖNTEM) ---
+            // --- 1. MENÜ GEÇİŞLERİ ---
             accordionControl1.ElementClick += (s, e) =>
             {
-                // İsim yerine direkt nesne kontrolü yapıyoruz (Daha güvenli)
                 if (e.Element == elmKatalog)
                 {
                     navFrameMusteri.SelectedPage = pageKatalog;
@@ -67,7 +133,7 @@ namespace Fabrika_Otomasyonu
                 else if (e.Element == elmTakip)
                 {
                     navFrameMusteri.SelectedPage = pageTakip;
-                    gcSiparisTakip.DataSource = siparisYonetim.SiparisleriGetir();
+                    gcSiparisTakip.DataSource = siparisYonetimi.SiparisleriGetir();
                 }
             };
 
@@ -89,9 +155,8 @@ namespace Fabrika_Otomasyonu
                     seciliUrunId = Convert.ToInt32(row["Id"]);
                     seciliModelAd = row["ModelAd"].ToString();
                     decimal birimFiyat = row["Fiyat"] != DBNull.Value ? Convert.ToDecimal(row["Fiyat"]) : 0;
-                    seciliTakimFiyati = birimFiyat * 8; // 1 Takım = 8 Çift
+                    seciliTakimFiyati = birimFiyat * 8;
 
-                    // Paneli Doldur
                     lblUrunBaslik.Text = seciliModelAd;
                     txtAdet.Value = 1;
                     FiyatHesapla();
@@ -106,18 +171,19 @@ namespace Fabrika_Otomasyonu
                 string secilenRenk = cmbVaryant.Text;
                 if (varyantHafiza.ContainsKey(secilenRenk))
                 {
-                    peSeciliResim.Image = ByteToImage(varyantHafiza[secilenRenk]);
+                    // YENİ GÜVENLİ METODU KULLANIYORUZ
+                    Image yeniResim = ByteToImage(varyantHafiza[secilenRenk]);
+                    ResmiKutuyaKoy(yeniResim);
                 }
                 else
                 {
-                    peSeciliResim.Image = null;
+                    ResmiKutuyaKoy(null);
                 }
             };
 
-            // --- 5. ADET DEĞİŞİMİ ---
+            // --- 5. ADET VE SEPET ---
             txtAdet.EditValueChanged += (s, e) => FiyatHesapla();
 
-            // --- 6. SEPETE EKLE ---
             btnSepeteEkle.Click += (s, e) =>
             {
                 if (seciliUrunId == 0 || cmbVaryant.SelectedIndex == -1)
@@ -134,60 +200,70 @@ namespace Fabrika_Otomasyonu
                     TakimSayisi = Convert.ToInt32(txtAdet.Value),
                     BirimFiyat = seciliTakimFiyati,
                     ToplamTutar = seciliTakimFiyati * Convert.ToInt32(txtAdet.Value),
-                    UrunResmi = peSeciliResim.Image
+                    UrunResmi = peSeciliResim.Image // Mevcut resmi alıyoruz
                 };
 
                 sepetListesi.Add(yeniOge);
                 XtraMessageBox.Show("Sepete eklendi!", "Başarılı");
-                TemizleSagPanel();
+
+                // Sepete ekledikten sonra paneli tamamen temizleme ki müşteri art arda ekleyebilsin
+                // Sadece adeti sıfırlayabilirsin veya böyle bırakabilirsin.
+                // TemizleSagPanel(); // <- Bunu kaldırdım, kullanıcı aynı üründen farklı renk seçebilsin diye.
                 SepetiGuncelle();
             };
 
-            // --- 7. SEPET İŞLEMLERİ ---
+            // --- DİĞER BUTONLAR ---
             btnSepetiTemizle.Click += (s, e) => { sepetListesi.Clear(); SepetiGuncelle(); };
 
             btnSepetiOnayla.Click += (s, e) =>
             {
                 if (sepetListesi.Count == 0) return;
-
                 if (XtraMessageBox.Show("Siparişi onaylıyor musunuz?", "Onay", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     foreach (var item in sepetListesi)
                     {
                         string tamAd = $"{item.ModelAd} ({item.Renk}) - [TAKIM]";
-                        siparisYonetim.SiparisOlustur("Misafir Müşteri", tamAd, item.TakimSayisi, item.BirimFiyat);
+                        siparisYonetimi.SiparisOlustur("Misafir Müşteri", tamAd, item.TakimSayisi, item.BirimFiyat);
                     }
                     sepetListesi.Clear();
                     SepetiGuncelle();
                     XtraMessageBox.Show("Sipariş alındı!", "Teşekkürler");
-
-                    // Takip sayfasına yönlendir
                     navFrameMusteri.SelectedPage = pageTakip;
-                    gcSiparisTakip.DataSource = siparisYonetim.SiparisleriGetir();
+                    gcSiparisTakip.DataSource = siparisYonetimi.SiparisleriGetir();
                 }
             };
 
-            // --- SİL BUTONU ---
             repoSil.ButtonClick += (s, e) =>
             {
                 var row = gvSepet.GetFocusedRow() as SepetOgesi;
-                if (row != null)
-                {
-                    sepetListesi.Remove(row);
-                    SepetiGuncelle();
-                }
+                if (row != null) { sepetListesi.Remove(row); SepetiGuncelle(); }
             };
-
-            // NOT: repoAdet.ButtonClick event'i Designer içinde repoAdet_ButtonClick yöntemiyle bağlandı.
         }
 
-        // --- YARDIMCI METODLAR ---
+        // --- KRİTİK YARDIMCI METODLAR ---
+
+        // Hafızayı şişirmemek için eski resmi silip yenisini koyan metod
+        private void ResmiKutuyaKoy(Image yeniResim)
+        {
+            // Eski resim varsa hafızadan at
+            if (peSeciliResim.Image != null)
+            {
+                peSeciliResim.Image.Dispose();
+            }
+
+            peSeciliResim.Image = yeniResim;
+        }
 
         private void VaryantlariDoldur(int id)
         {
+            // Güncelleme sırasında ekran titremesin
+            cmbVaryant.Properties.Items.BeginUpdate();
             cmbVaryant.Properties.Items.Clear();
+
+            // Resmi de güvenli temizle
+            ResmiKutuyaKoy(null);
+
             varyantHafiza.Clear();
-            peSeciliResim.Image = null;
 
             DataTable dt = vitrinYonetim.UrunDetaylariniGetir(id);
             foreach (DataRow row in dt.Rows)
@@ -198,33 +274,34 @@ namespace Fabrika_Otomasyonu
                 cmbVaryant.Properties.Items.Add(renk);
                 if (resim != null) varyantHafiza.Add(renk, resim);
             }
+            cmbVaryant.Properties.Items.EndUpdate(); // Güncellemeyi bitir
 
-            if (cmbVaryant.Properties.Items.Count > 0) cmbVaryant.SelectedIndex = 0;
+            if (cmbVaryant.Properties.Items.Count > 0)
+            {
+                cmbVaryant.SelectedIndex = 0;
+
+                // EKSTRA GÜVENLİK: 
+                // Index değişimi bazen tetiklenmeyebilir (zaten 0 ise),
+                // bu yüzden seçili rengin resmini burada ELLE yüklüyoruz.
+                string ilkRenk = cmbVaryant.Properties.Items[0].ToString();
+                if (varyantHafiza.ContainsKey(ilkRenk))
+                {
+                    ResmiKutuyaKoy(ByteToImage(varyantHafiza[ilkRenk]));
+                }
+            }
         }
 
         private void FiyatHesapla()
         {
-            if (seciliTakimFiyati > 0)
-            {
-                lblToplamFiyat.Text = (seciliTakimFiyati * txtAdet.Value).ToString("C2");
-            }
-            else
-            {
-                lblToplamFiyat.Text = "0.00 TL";
-            }
+            lblToplamFiyat.Text = seciliTakimFiyati > 0
+                ? (seciliTakimFiyati * txtAdet.Value).ToString("C2")
+                : "0.00 TL";
         }
 
         private void SepetiGuncelle()
         {
-            // BindingList ile DataSource zaten bağlı, sadece yenile ve toplamı hesapla
-            try
-            {
-                gcSepet.RefreshDataSource();
-            }
-            catch { gvSepet.RefreshData(); }
-
+            try { gcSepet.RefreshDataSource(); } catch { gvSepet.RefreshData(); }
             try { gvSepet.BestFitColumns(); } catch { }
-
             lblSepetToplam.Text = $"  Toplam: {sepetListesi.Sum(x => x.ToplamTutar):C2}";
         }
 
@@ -232,7 +309,7 @@ namespace Fabrika_Otomasyonu
         {
             seciliUrunId = 0;
             lblUrunBaslik.Text = "Ürün Seçiniz";
-            peSeciliResim.Image = null;
+            ResmiKutuyaKoy(null); // Güvenli temizleme
             cmbVaryant.Properties.Items.Clear();
             cmbVaryant.Text = "";
             txtAdet.Value = 1;
@@ -241,11 +318,19 @@ namespace Fabrika_Otomasyonu
 
         private Image ByteToImage(byte[] data)
         {
-            if (data == null) return null;
-            using (var ms = new MemoryStream(data)) return Image.FromStream(ms);
+            if (data == null || data.Length < 100) return null;
+            try
+            {
+                // Stream açık kalmalı, using kullanmıyoruz.
+                MemoryStream ms = new MemoryStream(data);
+                return Image.FromStream(ms);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
-        // repoAdet butonlarında tek handler: Tag ile plus/minus kontrolü -> SepetOgesi üzerinden güncelle
         private void repoAdet_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
         {
             var row = gvSepet.GetFocusedRow() as SepetOgesi;
@@ -273,8 +358,12 @@ namespace Fabrika_Otomasyonu
                     }
                 }
             }
-
             SepetiGuncelle();
+        }
+
+        private void cmbKategoriFiltre_Click(object sender, EventArgs e)
+        {
+            try { if (cmbKategoriFiltre != null) cmbKategoriFiltre.ShowPopup(); } catch { }
         }
     }
 }

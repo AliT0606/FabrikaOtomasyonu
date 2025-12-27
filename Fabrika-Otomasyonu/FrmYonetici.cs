@@ -28,30 +28,64 @@ namespace Fabrika_Otomasyonu
         private void BaslangicAyarlari()
         {
             // Dropdown (Seçim kutusu) içlerini dolduralım
-            cmbHammaddeTur.Properties.Items.AddRange(new object[] { "Deri", "Emitasyon", "Kumaş", "Süet", "Rugan" });
-            cmbHamTur.Properties.Items.AddRange(new object[] { "Deri", "Emitasyon", "Kumaş", "Süet", "Rugan", "Taban" });
+            // Ürün türleri: sadece Bot, Spor, Klasik
+            if (cmbUrunTur != null)
+            {
+                cmbUrunTur.Properties.Items.Clear();
+                cmbUrunTur.Properties.Items.AddRange(new object[] { "Bot", "Spor", "Klasik" });
+            }
+
+            // Renkler: siyah, lacivert, kahverengi, taba, haki
+            if (cmbRenkSec != null)
+            {
+                cmbRenkSec.Properties.Items.Clear();
+                cmbRenkSec.Properties.Items.AddRange(new object[] { "Siyah", "Lacivert", "Kahverengi", "Taba", "Haki" });
+            }
+
+            // Hammadde türleri: deri, emitasyon, bez
+            if (cmbHammaddeTur != null)
+            {
+                cmbHammaddeTur.Properties.Items.Clear();
+                cmbHammaddeTur.Properties.Items.AddRange(new object[] { "Deri", "Emitasyon", "Bez" });
+            }
+
+            // Hammadde giriş panelinde seçenekler (stok listesine ek olarak "Taban" eklendi)
+            if (cmbHamTur != null)
+            {
+                cmbHamTur.Properties.Items.Clear();
+                cmbHamTur.Properties.Items.AddRange(new object[] { "Deri", "Emitasyon", "Bez", "Taban" });
+            }
+
+            // Hammadde birim/varsayılan görüntü ayarları (varsa)
+            if (cmbHamBirim != null)
+            {
+                cmbHamBirim.Properties.Items.Clear();
+                cmbHamBirim.Properties.Items.AddRange(new object[] { "Adet", "Kg", "m² (Metrekare)", "Litre" });
+            }
 
             // --- YENİ AYARLAR ---
 
             // 1. Mesaj kutusuna elle yazmayı kapat (Sadece kopyalanabilir olur)
-            memoOzurMesaji.Properties.ReadOnly = true;
+            if (memoOzurMesaji != null) memoOzurMesaji.Properties.ReadOnly = true;
 
             // 2. Başlangıçta Makine/Sorun kutusu gizli olsun, seçim yapınca açılsın
-            lblArizaMakine.Visible = false;
-            txtArizaMakine.Visible = false;
+            if (lblArizaMakine != null) lblArizaMakine.Visible = false;
+            if (txtArizaMakine != null) txtArizaMakine.Visible = false;
 
             // 3. Panel Sayfa Açılınca Ortada Dursun
-            // Sayfa boyutu değişirse panel hep ortada kalsın diye olay ekliyoruz
-            pageMakineler.SizeChanged += (s, e) =>
+            if (pageMakineler != null && groupArizaBildirim != null)
             {
-                groupArizaBildirim.Location = new Point(
-                    (pageMakineler.Width - groupArizaBildirim.Width) / 2,
-                    (pageMakineler.Height - groupArizaBildirim.Height) / 2
-                );
-            };
+                pageMakineler.SizeChanged += (s, e) =>
+                {
+                    groupArizaBildirim.Location = new Point(
+                        (pageMakineler.Width - groupArizaBildirim.Width) / 2,
+                        (pageMakineler.Height - groupArizaBildirim.Height) / 2
+                    );
+                };
+            }
         }
 
-        // ... Diğer OlaylariBagla ve Buton metodları AYNI (önceki koddan devam) ...
+        // ... geri kalan metodlar (OlaylariBagla, BtnUrunKaydet_Click vb.) değişmedi ...
         private void OlaylariBagla()
         {
             // -----------------------------------------------------------
