@@ -142,10 +142,10 @@
             this.accordionControl1.Appearance.Item.Normal.Options.UseForeColor = true;
             this.accordionControl1.Dock = System.Windows.Forms.DockStyle.Left;
             this.accordionControl1.Elements.AddRange(new DevExpress.XtraBars.Navigation.AccordionControlElement[] {
-            this.elmUrunler,
             this.elmMakineler,
             this.elmHammadde,
-            this.elmSiparisler});
+            this.elmSiparisler,
+            this.elmUrunler});
             this.accordionControl1.Location = new System.Drawing.Point(0, 57);
             this.accordionControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.accordionControl1.Name = "accordionControl1";
@@ -252,7 +252,6 @@
             this.btnUrunKaldir.Size = new System.Drawing.Size(480, 41);
             this.btnUrunKaldir.TabIndex = 1;
             this.btnUrunKaldir.Text = "SEÇİLİ ÜRÜNÜ SİL";
-            this.btnUrunKaldir.Visible = true;
             // 
             // pnlUrunIslemleri
             // 
@@ -270,6 +269,8 @@
             // 
             this.groupUrunEkle.AppearanceCaption.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.groupUrunEkle.AppearanceCaption.ForeColor = System.Drawing.Color.DimGray;
+            this.groupUrunEkle.AppearanceCaption.Options.UseFont = true;
+            this.groupUrunEkle.AppearanceCaption.Options.UseForeColor = true;
             this.groupUrunEkle.Controls.Add(this.btnUrunKaydet);
             this.groupUrunEkle.Controls.Add(this.lstEklenenVaryantlar);
             this.groupUrunEkle.Controls.Add(this.groupVaryant);

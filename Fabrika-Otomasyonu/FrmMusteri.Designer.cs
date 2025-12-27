@@ -22,7 +22,7 @@
             // GRID SÜTUNLARI VE REPOSITORY
             this.colKapakResmi = new DevExpress.XtraGrid.Columns.TileViewColumn();
             this.colModelAd = new DevExpress.XtraGrid.Columns.TileViewColumn();
-            this.colAnaHammadde = new DevExpress.XtraGrid.Columns.TileViewColumn(); // yeni sütun
+            this.colAnaHammadde = new DevExpress.XtraGrid.Columns.TileViewColumn();
             this.colFiyat = new DevExpress.XtraGrid.Columns.TileViewColumn();
             this.colId = new DevExpress.XtraGrid.Columns.TileViewColumn();
 
@@ -114,10 +114,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.gvSiparisTakip)).BeginInit();
             this.SuspendLayout();
 
-            // --- HEADER ---
+            // --- HEADER (RENKLER GÜNCELLENDİ) ---
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Height = 70;
-            this.pnlHeader.Appearance.BackColor = System.Drawing.Color.FromArgb(0, 102, 204);
+            // Yönetici Paneli Mavisi:
+            this.pnlHeader.Appearance.BackColor = System.Drawing.Color.FromArgb(52, 152, 219);
             this.pnlHeader.Appearance.Options.UseBackColor = true;
             this.pnlHeader.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
             this.pnlHeader.Controls.Add(this.lblHeader);
@@ -129,11 +130,24 @@
             this.lblHeader.Appearance.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
             this.lblHeader.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
 
-            // --- SOL MENÜ ---
+            // --- SOL MENÜ (RENKLER GÜNCELLENDİ) ---
             this.accordionControl1.Dock = System.Windows.Forms.DockStyle.Left;
             this.accordionControl1.Size = new System.Drawing.Size(250, 630);
-            this.accordionControl1.Appearance.AccordionControl.BackColor = System.Drawing.Color.FromArgb(64, 64, 64);
+
+            // Yönetici Paneli Sol Menü Teması:
+            this.accordionControl1.Appearance.AccordionControl.BackColor = System.Drawing.Color.FromArgb(40, 44, 52);
             this.accordionControl1.Appearance.AccordionControl.Options.UseBackColor = true;
+
+            // Hover (Üzerine Gelince) Rengi:
+            this.accordionControl1.Appearance.Item.Hovered.BackColor = System.Drawing.Color.FromArgb(60, 66, 78);
+            this.accordionControl1.Appearance.Item.Hovered.ForeColor = System.Drawing.Color.White;
+            this.accordionControl1.Appearance.Item.Hovered.Options.UseBackColor = true;
+            this.accordionControl1.Appearance.Item.Hovered.Options.UseForeColor = true;
+
+            // Normal Renk:
+            this.accordionControl1.Appearance.Item.Normal.ForeColor = System.Drawing.Color.FromArgb(173, 181, 189);
+            this.accordionControl1.Appearance.Item.Normal.Options.UseForeColor = true;
+
             this.accordionControl1.Elements.AddRange(new DevExpress.XtraBars.Navigation.AccordionControlElement[] {
                 this.elmKatalog, this.elmSepet, this.elmTakip});
 
@@ -141,18 +155,26 @@
             this.elmSepet.Text = "SEPETİM"; this.elmSepet.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item; this.elmSepet.Height = 50;
             this.elmTakip.Text = "SİPARİŞ TAKİBİ"; this.elmTakip.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item; this.elmTakip.Height = 50;
 
-            // --- NAV FRAME ---
+            // --- NAV FRAME (ARKA PLAN GÜNCELLENDİ) ---
             this.navFrameMusteri.Dock = System.Windows.Forms.DockStyle.Fill;
+            // Yönetici Paneli Arka Plan Rengi:
+            this.navFrameMusteri.Appearance.BackColor = System.Drawing.Color.FromArgb(240, 242, 245);
+            this.navFrameMusteri.Appearance.Options.UseBackColor = true;
+
             this.navFrameMusteri.Pages.AddRange(new DevExpress.XtraBars.Navigation.NavigationPageBase[] { this.pageKatalog, this.pageSepet, this.pageTakip });
             this.navFrameMusteri.SelectedPage = this.pageKatalog;
 
             // =================================================================================
-            // SAYFA 1: KATALOG (GÜNCELLENDİ - FLOW WRAP + HAMMADDE ALT SATIRDA)
+            // SAYFA 1: KATALOG
             // =================================================================================
             this.pnlKatalogUst.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlKatalogUst.Height = 60;
+            this.pnlKatalogUst.Appearance.BackColor = System.Drawing.Color.Transparent; // Arka planı frame'den alsın
+            this.pnlKatalogUst.Appearance.Options.UseBackColor = true;
+            this.pnlKatalogUst.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
             this.pnlKatalogUst.Controls.Add(this.lblFiltre);
             this.pnlKatalogUst.Controls.Add(this.cmbKategoriFiltre);
+
             this.lblFiltre.Text = "Kategori Filtrele:";
             this.lblFiltre.Location = new System.Drawing.Point(30, 20);
             this.cmbKategoriFiltre.Location = new System.Drawing.Point(150, 17);
@@ -161,14 +183,20 @@
             this.cmbKategoriFiltre.Properties.Items.AddRange(new object[] { "Tümü", "Bot", "Spor", "Klasik" });
             this.cmbKategoriFiltre.SelectedIndex = 0;
             this.cmbKategoriFiltre.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
-            this.cmbKategoriFiltre.Properties.DropDownRows = 6;
             this.cmbKategoriFiltre.Click += new System.EventHandler(this.cmbKategoriFiltre_Click);
 
             this.pnlKatalogSag.Dock = System.Windows.Forms.DockStyle.Right;
             this.pnlKatalogSag.Width = 320;
+            this.pnlKatalogSag.Appearance.BackColor = System.Drawing.Color.White; // Sağ panel beyaz kalsın temiz görünsün
+            this.pnlKatalogSag.Appearance.Options.UseBackColor = true;
+            this.pnlKatalogSag.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
             this.pnlKatalogSag.Controls.Add(this.pnlSagDetay);
+
             this.pnlSagDetay.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlSagDetay.Padding = new System.Windows.Forms.Padding(20);
+            this.pnlSagDetay.Appearance.BackColor = System.Drawing.Color.White;
+            this.pnlSagDetay.Appearance.Options.UseBackColor = true;
+            this.pnlSagDetay.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
 
             this.lblUrunBaslik.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblUrunBaslik.Height = 50;
@@ -180,6 +208,7 @@
             this.peSeciliResim.Dock = System.Windows.Forms.DockStyle.Top;
             this.peSeciliResim.Height = 220;
             this.peSeciliResim.Properties.SizeMode = DevExpress.XtraEditors.Controls.PictureSizeMode.Zoom;
+            this.peSeciliResim.Properties.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
 
             this.cmbVaryant.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmbVaryant.Height = 40;
@@ -204,9 +233,11 @@
             this.btnSepeteEkle.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.btnSepeteEkle.Height = 55;
             this.btnSepeteEkle.Text = "SEPETE EKLE";
+            // Yönetici Paneli "Kaydet" Yeşili:
             this.btnSepeteEkle.Appearance.BackColor = System.Drawing.Color.FromArgb(46, 204, 113);
             this.btnSepeteEkle.Appearance.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btnSepeteEkle.Appearance.ForeColor = System.Drawing.Color.White;
+            this.btnSepeteEkle.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
 
             this.pnlSagDetay.Controls.Add(this.lblUrunBaslik);
             this.pnlSagDetay.Controls.Add(this.peSeciliResim);
@@ -219,48 +250,37 @@
             this.gcUrunVitrin.MainView = this.tvUrunVitrin;
             this.gcUrunVitrin.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.tvUrunVitrin });
 
+            // TileView Ayarları
             this.tvUrunVitrin.GridControl = this.gcUrunVitrin;
-            this.tvUrunVitrin.OptionsTiles.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.tvUrunVitrin.OptionsTiles.Orientation = System.Windows.Forms.Orientation.Vertical;
             this.tvUrunVitrin.OptionsTiles.ColumnCount = 0;
             this.tvUrunVitrin.OptionsTiles.RowCount = 0;
             this.tvUrunVitrin.OptionsTiles.ItemSize = new System.Drawing.Size(240, 320);
-
-            // Yan yana dizilip sığmadığında alt satıra geçmesi için:
-            this.tvUrunVitrin.OptionsTiles.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.tvUrunVitrin.OptionsTiles.RowCount = 0; // Otomatik satır sayısı
-            this.tvUrunVitrin.OptionsTiles.ColumnCount = 0;
-            this.tvUrunVitrin.OptionsTiles.ItemSize = new System.Drawing.Size(240, 320);
             this.tvUrunVitrin.OptionsTiles.Padding = new System.Windows.Forms.Padding(12);
             this.tvUrunVitrin.OptionsTiles.ItemPadding = new System.Windows.Forms.Padding(10);
-            // Smooth scroll opsiyonel
             this.tvUrunVitrin.OptionsBehavior.AllowSmoothScrolling = true;
-            // Görselin Tile içinde düzgün gözükmesi için KapakResmi column'u picture edit ile bağla
+
             this.colKapakResmi.FieldName = "KapakResmi";
-            this.colKapakResmi.ColumnEdit = this.repoResim; // <- önemli
+            this.colKapakResmi.ColumnEdit = this.repoResim;
             this.colKapakResmi.Visible = true;
 
-            // Diğer sütunlar
             this.colModelAd.FieldName = "ModelAd";
             this.colModelAd.Visible = true;
-
             this.colAnaHammadde.FieldName = "AnaHammadde";
             this.colAnaHammadde.Visible = true;
-
             this.colFiyat.FieldName = "Fiyat";
             this.colFiyat.Visible = true;
-
             this.colId.FieldName = "Id";
             this.colId.Visible = false;
 
             this.tvUrunVitrin.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] { this.colKapakResmi, this.colModelAd, this.colAnaHammadde, this.colFiyat, this.colId });
 
-            // Tile template elements (model adı altında hammaddesi gösterilir)
+            // Template tanımları aynen kalıyor
             tileViewItemElement1.Column = this.colKapakResmi;
             tileViewItemElement1.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.TopCenter;
             tileViewItemElement1.ImageOptions.ImageScaleMode = DevExpress.XtraEditors.TileItemImageScaleMode.ZoomInside;
             tileViewItemElement1.ImageOptions.ImageSize = new System.Drawing.Size(180, 180);
             tileViewItemElement1.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.Manual;
-            tileViewItemElement1.TextLocation = new System.Drawing.Point(0, 0);
 
             tileViewItemElement2.Column = this.colModelAd;
             tileViewItemElement2.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
@@ -293,7 +313,7 @@
             this.pageKatalog.Controls.Add(this.pnlKatalogUst);
 
             // =================================================================================
-            // SAYFA 2: SEPET (UYARI: aynı kalabilir)
+            // SAYFA 2: SEPET
             // =================================================================================
             this.pageSepet.Controls.Add(this.gcSepet);
             this.pageSepet.Controls.Add(this.pnlSepetAlt);
@@ -306,30 +326,25 @@
                 this.repoAdet,
                 this.repoSil
             });
-            this.gcSepet.BackColor = System.Drawing.Color.FromArgb(250, 250, 250);
+            // Yönetici Paneli Arka Plan Rengi Sepet İçin de Geçerli:
+            this.gcSepet.BackColor = System.Drawing.Color.FromArgb(240, 242, 245);
 
-            // Grid Genel
             this.gvSepet.GridControl = this.gcSepet;
             this.gvSepet.OptionsView.ShowColumnHeaders = false;
             this.gvSepet.OptionsView.ShowGroupPanel = false;
             this.gvSepet.OptionsView.ShowIndicator = false;
-            this.gvSepet.OptionsView.RowAutoHeight = false; // Yükseklik sabit kalsın
+            this.gvSepet.OptionsView.RowAutoHeight = false;
             this.gvSepet.RowHeight = 130;
-            this.gvSepet.OptionsView.ColumnAutoWidth = true; // Sütunlar ekrana yayılsın
-
+            this.gvSepet.OptionsView.ColumnAutoWidth = true;
             this.gvSepet.OptionsView.ShowVerticalLines = DevExpress.Utils.DefaultBoolean.False;
             this.gvSepet.OptionsView.ShowHorizontalLines = DevExpress.Utils.DefaultBoolean.True;
-            this.gvSepet.Appearance.Row.BackColor = System.Drawing.Color.White;
-            this.gvSepet.Appearance.HorzLine.BackColor = System.Drawing.Color.LightGray;
-            this.gvSepet.OptionsSelection.EnableAppearanceFocusedCell = false;
-            this.gvSepet.OptionsSelection.EnableAppearanceFocusedRow = false;
 
-            // SÜTUN 1: RESİM (UÇURUMU ENGELLEMEK İÇİN FIXED WIDTH)
+            // ... Sütun ayarları aynı ...
             this.colSepetResim.FieldName = "UrunResmi";
             this.colSepetResim.Visible = true;
             this.colSepetResim.VisibleIndex = 0;
-            this.colSepetResim.Width = 120; // Sabit Genişlik
-            this.colSepetResim.OptionsColumn.FixedWidth = true; // KİLİT NOKTA
+            this.colSepetResim.Width = 120;
+            this.colSepetResim.OptionsColumn.FixedWidth = true;
             this.colSepetResim.ColumnEdit = this.repoResim;
             this.colSepetResim.OptionsColumn.AllowEdit = false;
             this.colSepetResim.OptionsColumn.AllowFocus = false;
@@ -339,14 +354,12 @@
             this.repoResim.ShowMenu = false;
             this.repoResim.ReadOnly = true;
 
-            // SÜTUN 2: BİLGİ (Kalan tüm alanı bu kaplasın)
             this.colSepetBilgi.FieldName = "TamBilgi";
             this.colSepetBilgi.Visible = true;
             this.colSepetBilgi.VisibleIndex = 1;
             this.colSepetBilgi.ColumnEdit = this.repoBilgi;
             this.colSepetBilgi.OptionsColumn.AllowEdit = false;
             this.colSepetBilgi.OptionsColumn.AllowFocus = false;
-            // Dikey Ortalama
             this.colSepetBilgi.AppearanceCell.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
 
             this.repoBilgi.ReadOnly = true;
@@ -355,52 +368,42 @@
             this.repoBilgi.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.repoBilgi.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
 
-            // SÜTUN 3: ADET (DÜZELTİLDİ: [-] Sayı [+] Formatı)
             this.colSepetAdet.FieldName = "TakimSayisi";
             this.colSepetAdet.Visible = true;
             this.colSepetAdet.VisibleIndex = 2;
             this.colSepetAdet.Width = 140;
             this.colSepetAdet.OptionsColumn.FixedWidth = true;
             this.colSepetAdet.ColumnEdit = this.repoAdet;
-            // Tıklama için AllowEdit ve AllowFocus TRUE olmalı.
             this.colSepetAdet.OptionsColumn.AllowEdit = true;
             this.colSepetAdet.OptionsColumn.AllowFocus = true;
             this.colSepetAdet.AppearanceCell.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
 
             this.repoAdet.AutoHeight = false;
             this.repoAdet.Buttons.Clear();
-
-            // 1. EKSİ BUTONU (SOLA YAPIŞIK)
             DevExpress.XtraEditors.Controls.EditorButton btnEksi = new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph);
             btnEksi.Caption = " - ";
             btnEksi.Tag = "minus";
-            btnEksi.IsLeft = true; // <-- BU KOMUT SOLA ALIR
+            btnEksi.IsLeft = true;
             btnEksi.Appearance.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             btnEksi.Appearance.ForeColor = System.Drawing.Color.Red;
 
-            // 2. ARTI BUTONU (SAĞA YAPIŞIK)
             DevExpress.XtraEditors.Controls.EditorButton btnArti = new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph);
             btnArti.Caption = " + ";
             btnArti.Tag = "plus";
-            btnArti.IsLeft = false; // <-- BU KOMUT SAĞA ALIR
+            btnArti.IsLeft = false;
             btnArti.Appearance.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             btnArti.Appearance.ForeColor = System.Drawing.Color.Green;
-
             this.repoAdet.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] { btnEksi, btnArti });
-
-            // METİN AYARLARI (Klavye girişi kapalı, sadece görsel sayı)
             this.repoAdet.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
             this.repoAdet.Appearance.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.repoAdet.Appearance.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
             this.repoAdet.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.HotFlat;
-
-            // ButtonClick Event'ini buraya bağlıyoruz!
             this.repoAdet.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.repoAdet_ButtonClick);
-            // SÜTUN 4: TUTAR (Genişlik arttırıldı, kesilme engellendi)
+
             this.colSepetTutar.FieldName = "ToplamTutar";
             this.colSepetTutar.Visible = true;
             this.colSepetTutar.VisibleIndex = 3;
-            this.colSepetTutar.Width = 160; // Genişletildi
+            this.colSepetTutar.Width = 160;
             this.colSepetTutar.OptionsColumn.FixedWidth = true;
             this.colSepetTutar.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.colSepetTutar.DisplayFormat.FormatString = "c2";
@@ -412,7 +415,6 @@
             this.colSepetTutar.OptionsColumn.AllowFocus = false;
             this.colSepetTutar.AppearanceCell.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
 
-            // SÜTUN 5: SİL
             this.colSepetSil.Visible = true;
             this.colSepetSil.VisibleIndex = 4;
             this.colSepetSil.Width = 60;
@@ -429,9 +431,10 @@
                 this.colSepetResim, this.colSepetBilgi, this.colSepetAdet, this.colSepetTutar, this.colSepetSil
             });
 
-            // Sepet Alt Panel
             this.pnlSepetAlt.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlSepetAlt.Height = 70;
+            this.pnlSepetAlt.BackColor = System.Drawing.Color.FromArgb(240, 242, 245); // Arka plan uyumu
+            this.pnlSepetAlt.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder; // Çizgiyi kaldırdık temiz dursun
             this.pnlSepetAlt.Controls.Add(this.lblSepetToplam);
             this.pnlSepetAlt.Controls.Add(this.btnSepetiTemizle);
             this.pnlSepetAlt.Controls.Add(this.btnSepetiOnayla);
@@ -444,14 +447,18 @@
             this.btnSepetiOnayla.Dock = System.Windows.Forms.DockStyle.Right;
             this.btnSepetiOnayla.Text = "SEPETİ ONAYLA";
             this.btnSepetiOnayla.Width = 160;
-            this.btnSepetiOnayla.Appearance.BackColor = System.Drawing.Color.FromArgb(242, 122, 26);
+            // Yönetici Paneli "Ekle/Turuncu" Rengi:
+            this.btnSepetiOnayla.Appearance.BackColor = System.Drawing.Color.FromArgb(243, 156, 18);
             this.btnSepetiOnayla.Appearance.ForeColor = System.Drawing.Color.White;
+            this.btnSepetiOnayla.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
 
             this.btnSepetiTemizle.Dock = System.Windows.Forms.DockStyle.Right;
             this.btnSepetiTemizle.Text = "TEMİZLE";
             this.btnSepetiTemizle.Width = 120;
-            this.btnSepetiTemizle.Appearance.BackColor = System.Drawing.Color.Firebrick;
+            // Yönetici Paneli "Sil/Kırmızı" Rengi:
+            this.btnSepetiTemizle.Appearance.BackColor = System.Drawing.Color.FromArgb(231, 76, 60);
             this.btnSepetiTemizle.Appearance.ForeColor = System.Drawing.Color.White;
+            this.btnSepetiTemizle.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
 
             // TAKİP
             this.pageTakip.Controls.Add(this.gcSiparisTakip);
@@ -502,7 +509,7 @@
 
         #endregion
 
-        // DEĞİŞKENLER (AnaHammadde eklendi)
+        // DEĞİŞKENLER (Aynı kalıyor)
         private DevExpress.XtraEditors.PanelControl pnlHeader;
         private DevExpress.XtraEditors.LabelControl lblHeader;
         private DevExpress.XtraBars.Navigation.AccordionControl accordionControl1;
@@ -524,7 +531,7 @@
         private DevExpress.XtraGrid.Views.Tile.TileView tvUrunVitrin;
         private DevExpress.XtraGrid.Columns.TileViewColumn colKapakResmi;
         private DevExpress.XtraGrid.Columns.TileViewColumn colModelAd;
-        private DevExpress.XtraGrid.Columns.TileViewColumn colAnaHammadde; // eklendi
+        private DevExpress.XtraGrid.Columns.TileViewColumn colAnaHammadde;
         private DevExpress.XtraGrid.Columns.TileViewColumn colFiyat;
         private DevExpress.XtraGrid.Columns.TileViewColumn colId;
         private DevExpress.XtraEditors.LabelControl lblUrunBaslik;
@@ -534,7 +541,7 @@
         private DevExpress.XtraEditors.LabelControl lblToplamFiyat;
         private DevExpress.XtraEditors.SimpleButton btnSepeteEkle;
 
-        // SEPET (ÖZELLEŞTİRİLMİŞ)
+        // SEPET
         private DevExpress.XtraGrid.GridControl gcSepet;
         private DevExpress.XtraGrid.Views.Grid.GridView gvSepet;
         private DevExpress.XtraGrid.Columns.GridColumn colSepetResim;
