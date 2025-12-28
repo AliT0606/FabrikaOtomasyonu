@@ -125,6 +125,7 @@
       <DependentUpon>FrmYonetici.cs</DependentUpon>
     </Compile>
     <Compile Include="HammaddeYonetimi.cs" />
+    <Compile Include="MusteriYonetimi.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SepetOgesi.cs" />

@@ -8,6 +8,7 @@ namespace Fabrika_Otomasyonu
         public int UrunId { get; set; }
         public string ModelAd { get; set; }
         public string Renk { get; set; }
+        public string AnaHammadde { get; set; }
         public int TakimSayisi { get; set; } // Kaç takım?
         public decimal BirimFiyat { get; set; } // 1 Takım Fiyatı
         public decimal ToplamTutar { get; set; } // Takım * Adet
@@ -19,6 +20,7 @@ namespace Fabrika_Otomasyonu
                 return $"{ModelAd}\nRenk: {Renk}\nBirim Fiyat: {BirimFiyat:C2}";
             }
         }
+       
     }
 
 }

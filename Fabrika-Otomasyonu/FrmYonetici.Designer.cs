@@ -61,6 +61,12 @@
             this.cmbHamBirim = new DevExpress.XtraEditors.ComboBoxEdit();
             this.cmbHamTur = new DevExpress.XtraEditors.ComboBoxEdit();
             this.pageSiparisler = new DevExpress.XtraBars.Navigation.NavigationPage();
+
+            // --- YENİ EKLENEN KISIM (SİPARİŞ GRİDİ) ---
+            this.gcSiparisYonetim = new DevExpress.XtraGrid.GridControl();
+            this.gvSiparisYonetim = new DevExpress.XtraGrid.Views.Grid.GridView();
+            // ------------------------------------------
+
             ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
             this.pnlHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.accordionControl1)).BeginInit();
@@ -99,6 +105,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtHamMiktar.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbHamBirim.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbHamTur.Properties)).BeginInit();
+
+            // --- SİPARİŞ GRİD INIT ---
+            this.pageSiparisler.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gcSiparisYonetim)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gvSiparisYonetim)).BeginInit();
+            // -------------------------
+
             this.SuspendLayout();
             // 
             // pnlHeader
@@ -175,7 +188,7 @@
             // 
             this.elmSiparisler.Name = "elmSiparisler";
             this.elmSiparisler.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
-            this.elmSiparisler.Text = "  SİPARİŞ TAKİBİ";
+            this.elmSiparisler.Text = "  SİPARİŞ YÖNETİMİ"; // DÜZELTİLDİ
             // 
             // navFrameYonetici
             // 
@@ -693,9 +706,27 @@
             // pageSiparisler
             // 
             this.pageSiparisler.Caption = "pageSiparisler";
+            this.pageSiparisler.Controls.Add(this.gcSiparisYonetim);
             this.pageSiparisler.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pageSiparisler.Name = "pageSiparisler";
             this.pageSiparisler.Size = new System.Drawing.Size(806, 552);
+            // 
+            // gcSiparisYonetim
+            // 
+            this.gcSiparisYonetim.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gcSiparisYonetim.Location = new System.Drawing.Point(0, 0);
+            this.gcSiparisYonetim.MainView = this.gvSiparisYonetim;
+            this.gcSiparisYonetim.Name = "gcSiparisYonetim";
+            this.gcSiparisYonetim.Size = new System.Drawing.Size(806, 552);
+            this.gcSiparisYonetim.TabIndex = 0;
+            this.gcSiparisYonetim.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gvSiparisYonetim});
+            // 
+            // gvSiparisYonetim
+            // 
+            this.gvSiparisYonetim.GridControl = this.gcSiparisYonetim;
+            this.gvSiparisYonetim.Name = "gvSiparisYonetim";
+            this.gvSiparisYonetim.OptionsView.ShowGroupPanel = false;
             // 
             // FrmYonetici
             // 
@@ -750,6 +781,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtHamMiktar.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbHamBirim.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbHamTur.Properties)).EndInit();
+            this.pageSiparisler.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gcSiparisYonetim)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gvSiparisYonetim)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -803,5 +837,9 @@
         private DevExpress.XtraEditors.LabelControl lblArizaMakine;
         private DevExpress.XtraEditors.ComboBoxEdit cmbSorunTipi;
         private DevExpress.XtraEditors.LabelControl lblSorunTipi;
+
+        // --- YENİ EKLENEN DEĞİŞKENLER ---
+        public DevExpress.XtraGrid.GridControl gcSiparisYonetim;
+        public DevExpress.XtraGrid.Views.Grid.GridView gvSiparisYonetim;
     }
 }

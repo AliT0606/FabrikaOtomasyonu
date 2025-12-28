@@ -41,44 +41,44 @@ namespace Fabrika_Otomasyonu
         }
 
         // 2. Yeni Ürün Kaydet (Transaction kullanarak: Hem ürün hem varyantlar tek seferde)
+        // GÜNCELLENMİŞ URUN EKLEME (Kapasiteye Göre Süre Hesabı)
         public void UrunEkle(string model, string tur, string hammadde, decimal fiyat, List<GeciciVaryant> varyantlar)
         {
+            // ÜRETİM SÜRELERİNİ NET OLARAK VERİYORUZ 
+            double birimSure = 0.1; // Varsayılan
+
+            if (tur == "Klasik")
+                birimSure = 0.1;    // 10 Takım/Gün (1 / 10 = 0.10)
+            else if (tur == "Spor")
+                birimSure = 0.150;  // <-- SENİN İSTEDİĞİN YENİ DEĞER (Yaklaşık 6.6 Takım/Gün)
+            else if (tur == "Bot")
+                birimSure = 0.2;    // 5 Takım/Gün (1 / 5 = 0.20)
+
             using (var con = Veritabani.BaglantiGetir())
             {
-                using (var transaction = con.BeginTransaction())
+                string sql = "INSERT INTO Urunler (ModelAd, Tur, AnaHammadde, Fiyat, UretimGunu) VALUES (@model, @tur, @ham, @fiyat, @sure)";
+                long urunId;
+                using (var cmd = new SQLiteCommand(sql, con))
                 {
-                    try
-                    {
-                        // Fiyatı da ekliyoruz
-                        string sqlUrun = "INSERT INTO Urunler (ModelAd, Tur, AnaHammadde, Fiyat) VALUES (@model, @tur, @ham, @fiyat); SELECT last_insert_rowid();";
-                        long yeniUrunId;
+                    cmd.Parameters.AddWithValue("@model", model);
+                    cmd.Parameters.AddWithValue("@tur", tur);
+                    cmd.Parameters.AddWithValue("@ham", hammadde);
+                    cmd.Parameters.AddWithValue("@fiyat", fiyat);
+                    cmd.Parameters.AddWithValue("@sure", birimSure); // <-- Net değer kaydediliyor
+                    cmd.ExecuteNonQuery();
+                    urunId = con.LastInsertRowId;
+                }
 
-                        using (var cmd = new SQLiteCommand(sqlUrun, con))
-                        {
-                            cmd.Parameters.AddWithValue("@model", model);
-                            cmd.Parameters.AddWithValue("@tur", tur);
-                            cmd.Parameters.AddWithValue("@ham", hammadde);
-                            cmd.Parameters.AddWithValue("@fiyat", fiyat); // Fiyat parametresi
-                            yeniUrunId = (long)cmd.ExecuteScalar();
-                        }
-
-                        string sqlVaryant = "INSERT INTO UrunVaryant (UrunId, Renk, Resim) VALUES (@uid, @renk, @resim)";
-                        foreach (var item in varyantlar)
-                        {
-                            using (var cmdVar = new SQLiteCommand(sqlVaryant, con))
-                            {
-                                cmdVar.Parameters.AddWithValue("@uid", yeniUrunId);
-                                cmdVar.Parameters.AddWithValue("@renk", item.Renk);
-                                cmdVar.Parameters.AddWithValue("@resim", item.ResimData);
-                                cmdVar.ExecuteNonQuery();
-                            }
-                        }
-                        transaction.Commit();
-                    }
-                    catch (Exception)
+                // Varyantları kaydetme (Aynı kalıyor)
+                foreach (var v in varyantlar)
+                {
+                    string vSql = "INSERT INTO UrunVaryant (UrunId, Renk, Resim) VALUES (@uid, @renk, @resim)";
+                    using (var cmd = new SQLiteCommand(vSql, con))
                     {
-                        transaction.Rollback();
-                        throw;
+                        cmd.Parameters.AddWithValue("@uid", urunId);
+                        cmd.Parameters.AddWithValue("@renk", v.Renk);
+                        cmd.Parameters.AddWithValue("@resim", v.ResimData);
+                        cmd.ExecuteNonQuery();
                     }
                 }
             }

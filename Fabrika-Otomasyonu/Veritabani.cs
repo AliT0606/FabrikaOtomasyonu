@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SQLite;
+using System.Drawing;
 using System.IO;
 
 namespace Fabrika_Otomasyonu
@@ -36,87 +37,54 @@ namespace Fabrika_Otomasyonu
         // -----------------------------------------------------------
         public static void TablolariKur()
         {
-            // Dosya yoksa oluşturur
-            if (!File.Exists(dosyaAdi))
-            {
-                SQLiteConnection.CreateFile(dosyaAdi);
-            }
+            if (!File.Exists(dosyaAdi)) SQLiteConnection.CreateFile(dosyaAdi);
 
             using (var con = BaglantiGetir())
             {
                 using (var cmd = new SQLiteCommand(con))
                 {
-                    // A) KULLANICILAR (Yönetici ve Müşteri)
-                    cmd.CommandText = @"
-                        CREATE TABLE IF NOT EXISTS Kullanicilar (
-                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            AdSoyad TEXT,
-                            KullaniciAdi TEXT, -- Yönetici için
-                            Sifre TEXT,        -- Yönetici için
-                            Telefon TEXT,      -- Müşteri için
-                            Rol TEXT           -- 'Yonetici' veya 'Musteri'
-                        );";
+                    // Tabloları oluştur (Standart kodlar)
+                    cmd.CommandText = "CREATE TABLE IF NOT EXISTS Kullanicilar (Id INTEGER PRIMARY KEY AUTOINCREMENT, AdSoyad TEXT, KullaniciAdi TEXT, Sifre TEXT, Telefon TEXT, Rol TEXT);";
                     cmd.ExecuteNonQuery();
 
-                    // B) ÜRÜNLER (Master Tablo)
-                    cmd.CommandText = @"
-                        CREATE TABLE IF NOT EXISTS Urunler (
-                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            ModelAd TEXT NOT NULL,
-                            Tur TEXT,          -- Bot, Klasik, Spor
-                            AnaHammadde TEXT,  -- Deri, Süet vb.
-                            Fiyat REAL DEFAULT 0
-                        );";
+                    cmd.CommandText = "CREATE TABLE IF NOT EXISTS Urunler (Id INTEGER PRIMARY KEY AUTOINCREMENT, ModelAd TEXT NOT NULL, Tur TEXT, AnaHammadde TEXT, Fiyat REAL DEFAULT 0);";
                     cmd.ExecuteNonQuery();
 
-                    // C) ÜRÜN VARYANTLARI (Detay Tablo - Resimler Burada)
-                    // FOREIGN KEY: Urunler tablosundaki Id silinirse buradakiler de silinsin (CASCADE)
-                    cmd.CommandText = @"
-                        CREATE TABLE IF NOT EXISTS UrunVaryant (
-                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            UrunId INTEGER,
-                            Renk TEXT,
-                            Resim BLOB, 
-                            FOREIGN KEY(UrunId) REFERENCES Urunler(Id) ON DELETE CASCADE
-                        );";
+                    cmd.CommandText = "CREATE TABLE IF NOT EXISTS UrunVaryant (Id INTEGER PRIMARY KEY AUTOINCREMENT, UrunId INTEGER, Renk TEXT, Resim BLOB, FOREIGN KEY(UrunId) REFERENCES Urunler(Id) ON DELETE CASCADE);";
                     cmd.ExecuteNonQuery();
 
-                    // D) HAMMADDELER (Stok Takibi)
-                    cmd.CommandText = @"
-                        CREATE TABLE IF NOT EXISTS Hammaddeler (
-                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            Tur TEXT,     -- Ayakkabı Hammaddesi / Taban
-                            Birim TEXT,   -- m2 / Adet
-                            Miktar REAL DEFAULT 0
-                        );";
+                    cmd.CommandText = "CREATE TABLE IF NOT EXISTS Hammaddeler (Id INTEGER PRIMARY KEY AUTOINCREMENT, Tur TEXT, Birim TEXT, Miktar REAL DEFAULT 0);";
                     cmd.ExecuteNonQuery();
 
-                    // E) MAKİNELER (Arıza Takibi)
-                    cmd.CommandText = @"
-                        CREATE TABLE IF NOT EXISTS Makineler (
-                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            MakineAd TEXT,
-                            Durum TEXT DEFAULT 'Aktif', -- Aktif, Arızalı, Bakımda
-                            ArizaMesaji TEXT
-                        );";
+                    cmd.CommandText = "CREATE TABLE IF NOT EXISTS Makineler (Id INTEGER PRIMARY KEY AUTOINCREMENT, MakineAd TEXT, Durum TEXT DEFAULT 'Aktif', ArizaMesaji TEXT);";
                     cmd.ExecuteNonQuery();
 
-                    // F) SİPARİŞLER
-                    cmd.CommandText = @"
-                        CREATE TABLE IF NOT EXISTS Siparisler (
-                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            MusteriId INTEGER,
-                            UrunVaryantId INTEGER, -- Hangi renk sipariş edildi?
-                            Adet INTEGER,
-                            Tarih DATETIME DEFAULT CURRENT_TIMESTAMP,
-                            Durum TEXT DEFAULT 'Hazırlanıyor'
-                        );";
+                    cmd.CommandText = "CREATE TABLE IF NOT EXISTS Siparisler (Id INTEGER PRIMARY KEY AUTOINCREMENT, MusteriAdi TEXT, Telefon TEXT, UrunAdi TEXT, Adet INTEGER, Tutar DECIMAL, Adres TEXT, Durum TEXT DEFAULT 'Hazırlanıyor', Tarih DATETIME DEFAULT CURRENT_TIMESTAMP);";
+                    cmd.ExecuteNonQuery();
+                    
+                    cmd.CommandText = @"CREATE TABLE IF NOT EXISTS Bildirimler (Id INTEGER PRIMARY KEY AUTOINCREMENT, Baslik TEXT, Mesaj TEXT, Tarih DATETIME DEFAULT CURRENT_TIMESTAMP, AktifMi INTEGER DEFAULT 1);";
                     cmd.ExecuteNonQuery();
                 }
 
-                // Tablolar oluştuysa varsayılan verileri ekleyelim (Admin vb.)
+                // --- YAMA BÖLÜMÜ (Sütun Eksikse Ekle) ---
+                try { using (var c = new SQLiteCommand("ALTER TABLE Siparisler ADD COLUMN Telefon TEXT", con)) c.ExecuteNonQuery(); } catch { }
+                try { using (var c = new SQLiteCommand("ALTER TABLE Siparisler ADD COLUMN MusteriAdi TEXT", con)) c.ExecuteNonQuery(); } catch { }
+                try { using (var c = new SQLiteCommand("ALTER TABLE Siparisler ADD COLUMN Durum TEXT DEFAULT 'Onay Bekliyor'", con)) c.ExecuteNonQuery(); } catch { }
+                try { using (var c = new SQLiteCommand("ALTER TABLE Kullanicilar ADD COLUMN Adres TEXT", con)) c.ExecuteNonQuery(); } catch { }
+                // Ürünlere 'Birim Üretim Süresi' (1 takım kaç gün?) ekle
+                try { using (var c = new SQLiteCommand("ALTER TABLE Urunler ADD COLUMN UretimGunu REAL DEFAULT 0.1", con)) c.ExecuteNonQuery(); } catch { }
+
+                // Siparişlere 'Tahmini Bitiş Tarihi' ekle
+                try { using (var c = new SQLiteCommand("ALTER TABLE Siparisler ADD COLUMN TahminiTarih DATETIME", con)) c.ExecuteNonQuery(); } catch { }
+                try { using (var c = new SQLiteCommand("ALTER TABLE Siparisler ADD COLUMN SiparisKodu TEXT", con)) c.ExecuteNonQuery(); } catch { }
+
+
+                // YENİ EKLENEN: ADRES SÜTUNU
+                try { using (var c = new SQLiteCommand("ALTER TABLE Siparisler ADD COLUMN Adres TEXT", con)) c.ExecuteNonQuery(); } catch { }
+
                 VarsayilanVeriEkle(con);
             }
+            // Kullanicilar tablosuna Adres sütunu ekle (Eksikse)
         }
 
         // -----------------------------------------------------------

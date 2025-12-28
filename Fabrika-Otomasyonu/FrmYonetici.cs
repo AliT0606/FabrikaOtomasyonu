@@ -1,5 +1,6 @@
-﻿
-using DevExpress.XtraEditors;
+﻿using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Repository; // Butonlar için gerekli
+using DevExpress.XtraGrid.Columns;       // Sütun işlemleri için gerekli
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,67 +13,183 @@ namespace Fabrika_Otomasyonu
         UrunYonetimi urunYonetim = new UrunYonetimi();
         HammaddeYonetimi hammaddeYonetim = new HammaddeYonetimi();
         BildirimYonetimi bildirimYonetim = new BildirimYonetimi();
+        SiparisYonetimi siparisYonetimi = new SiparisYonetimi(); // Sipariş sınıfı
+
         List<GeciciVaryant> eklenecekVaryantlar = new List<GeciciVaryant>();
 
         public FrmYonetici()
         {
             InitializeComponent();
             Veritabani.TablolariKur();
+
+            // Sipariş Grid'inin buton ayarlarını yapıyoruz
+            SiparisGridiniHazirla();
+
             BaslangicAyarlari();
-            
+
             UrunListesiniYenile();
             HammaddeListesiniYenile();
             OlaylariBagla();
+            this.FormClosed += (s, e) => Application.Exit();
         }
+
+        // ============================================================
+        // 1. SİPARİŞ YÖNETİMİ MANTIKLARI (YENİ EKLENEN KISIM)
+        // ============================================================
+        private void SiparisGridiniHazirla()
+        {
+            // Grid Designer'da eklendi ama buton olaylarını burada kodla bağlıyoruz.
+            // Bu sayede "ONAYLA" veya "KARGOLA" ayrımını yapabileceğiz.
+
+            // 1. Buton Nesnesi Oluştur (RepositoryItem)
+            RepositoryItemButtonEdit btnIslem = new RepositoryItemButtonEdit();
+            btnIslem.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.HideTextEditor;
+            btnIslem.Buttons[0].Kind = DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph;
+            btnIslem.Buttons[0].Caption = "İşlem";
+
+            // Tıklama Olayını Bağla
+            btnIslem.ButtonClick += SiparisIslem_Click;
+
+            // Grid'e Ekle
+            gcSiparisYonetim.RepositoryItems.Add(btnIslem);
+
+            // 2. Her satır için butonu özelleştir (Onay Bekliyor -> Turuncu, Hazırlanıyor -> Yeşil)
+            gvSiparisYonetim.CustomRowCellEdit += (s, e) =>
+            {
+                if (e.Column.FieldName == "Islem")
+                {
+                    string durum = gvSiparisYonetim.GetRowCellValue(e.RowHandle, "Durum")?.ToString();
+
+                    // Butonun kopyasını alıp o satıra özel ayarlıyoruz
+                    RepositoryItemButtonEdit btn = btnIslem.Clone() as RepositoryItemButtonEdit;
+
+                    if (durum == "Onay Bekliyor")
+                    {
+                        btn.Buttons[0].Caption = "ONAYLA";
+                        btn.Buttons[0].Appearance.BackColor = Color.Orange;
+                    }
+                    else if (durum == "Hazırlanıyor")
+                    {
+                        btn.Buttons[0].Caption = "KARGOLA";
+                        btn.Buttons[0].Appearance.BackColor = Color.DarkOrange;
+                        btn.Buttons[0].Appearance.ForeColor = Color.White;
+                    }
+                    else
+                    {
+                        btn.Buttons[0].Caption = "Tamamlandı";
+                        btn.Buttons[0].Enabled = false; // Tıklanamaz yap
+                    }
+                    e.RepositoryItem = btn;
+                }
+            };
+        }
+
+        private void SiparisIslem_Click(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+        {
+            var row = gvSiparisYonetim.GetFocusedDataRow();
+            if (row == null) return;
+
+            // ID yerine KOD alıyoruz
+            string siparisKodu = row["SiparisKodu"].ToString();
+            string durum = row["Durum"].ToString();
+
+            if (durum == "Onay Bekliyor")
+            {
+                // Grup bazlı onay metodunu çağırıyoruz
+                bool basarili = siparisYonetimi.SiparisiOnaylaVeStokDus(siparisKodu);
+
+                if (basarili)
+                {
+                    siparisYonetimi.TumTarihleriGuncelle(); // Tarihleri ötele
+                    XtraMessageBox.Show("Tüm paket onaylandı ve üretime alındı.");
+                }
+            }
+            else if (durum == "Hazırlanıyor")
+            {
+                // Grup bazlı durum değiştirme
+                siparisYonetimi.DurumDegistirGrup(siparisKodu, "Kargoda");
+
+                siparisYonetimi.TumTarihleriGuncelle(); // Sıra boşaldı, öne çek
+                XtraMessageBox.Show("Paketteki tüm ürünler kargoya verildi!");
+            }
+
+            SiparisleriYenile();
+        }
+
+        private void SiparisleriYenile()
+        {
+            gcSiparisYonetim.DataSource = siparisYonetimi.SiparisleriGetir();
+            gvSiparisYonetim.BestFitColumns();
+
+            // 1. İşlem Sütunu (Buton)
+            if (gvSiparisYonetim.Columns["Islem"] == null)
+            {
+                GridColumn col = gvSiparisYonetim.Columns.AddField("Islem");
+                col.Visible = true;
+                col.Caption = "İŞLEMLER";
+                col.Width = 100;
+                col.VisibleIndex = 99;
+            }
+
+            // 2. Gereksizleri Gizle
+            if (gvSiparisYonetim.Columns["Id"] != null) gvSiparisYonetim.Columns["Id"].Visible = false;
+
+            // --- KRİTİK NOKTA: GRUPLAMA AYARI ---
+            // Eğer SiparisKodu sütunu varsa, ona göre grupla
+            if (gvSiparisYonetim.Columns["SiparisKodu"] != null)
+            {
+                gvSiparisYonetim.Columns["SiparisKodu"].GroupIndex = 0; // 0. seviye gruplama yap
+                gvSiparisYonetim.ExpandAllGroups(); // Grupları açık tut
+
+                // Görünüm Ayarları
+                gvSiparisYonetim.OptionsView.ShowGroupPanel = false; // Yukarıdaki boşluğu gizle
+                gvSiparisYonetim.OptionsBehavior.AutoExpandAllGroups = true;
+            }
+        }
+
+        // ============================================================
+        // 2. DİĞER AYARLAR VE EVENTLER (SENİN KODLARIN)
+        // ============================================================
 
         private void BaslangicAyarlari()
         {
             // Dropdown (Seçim kutusu) içlerini dolduralım
-            // Ürün türleri: sadece Bot, Spor, Klasik
             if (cmbUrunTur != null)
             {
                 cmbUrunTur.Properties.Items.Clear();
                 cmbUrunTur.Properties.Items.AddRange(new object[] { "Bot", "Spor", "Klasik" });
             }
 
-            // Renkler: siyah, lacivert, kahverengi, taba, haki
             if (cmbRenkSec != null)
             {
                 cmbRenkSec.Properties.Items.Clear();
                 cmbRenkSec.Properties.Items.AddRange(new object[] { "Siyah", "Lacivert", "Kahverengi", "Taba", "Haki" });
             }
 
-            // Hammadde türleri: deri, emitasyon, bez
             if (cmbHammaddeTur != null)
             {
                 cmbHammaddeTur.Properties.Items.Clear();
                 cmbHammaddeTur.Properties.Items.AddRange(new object[] { "Deri", "Emitasyon", "Bez" });
             }
 
-            // Hammadde giriş panelinde seçenekler (stok listesine ek olarak "Taban" eklendi)
             if (cmbHamTur != null)
             {
                 cmbHamTur.Properties.Items.Clear();
                 cmbHamTur.Properties.Items.AddRange(new object[] { "Deri", "Emitasyon", "Bez", "Taban" });
             }
 
-            // Hammadde birim/varsayılan görüntü ayarları (varsa)
             if (cmbHamBirim != null)
             {
                 cmbHamBirim.Properties.Items.Clear();
                 cmbHamBirim.Properties.Items.AddRange(new object[] { "Adet", "Kg", "m² (Metrekare)", "Litre" });
             }
 
-            // --- YENİ AYARLAR ---
-
-            // 1. Mesaj kutusuna elle yazmayı kapat (Sadece kopyalanabilir olur)
+            // Diğer ayarlar
             if (memoOzurMesaji != null) memoOzurMesaji.Properties.ReadOnly = true;
-
-            // 2. Başlangıçta Makine/Sorun kutusu gizli olsun, seçim yapınca açılsın
             if (lblArizaMakine != null) lblArizaMakine.Visible = false;
             if (txtArizaMakine != null) txtArizaMakine.Visible = false;
 
-            // 3. Panel Sayfa Açılınca Ortada Dursun
+            // Paneli Ortala
             if (pageMakineler != null && groupArizaBildirim != null)
             {
                 pageMakineler.SizeChanged += (s, e) =>
@@ -85,18 +202,13 @@ namespace Fabrika_Otomasyonu
             }
         }
 
-        // ... geri kalan metodlar (OlaylariBagla, BtnUrunKaydet_Click vb.) değişmedi ...
         private void OlaylariBagla()
         {
-            // -----------------------------------------------------------
-            // 1. SOL MENÜ GEÇİŞLERİ
-            // -----------------------------------------------------------
             accordionControl1.ElementClick += (s, e) =>
             {
-                // Sadece alt elemanlara (Item) tıklayınca çalışsın
                 if (e.Element.Style == DevExpress.XtraBars.Navigation.ElementStyle.Item)
                 {
-                    lblBaslik.Text = e.Element.Text; // Başlığı güncelle
+                    lblBaslik.Text = e.Element.Text;
 
                     switch (e.Element.Name)
                     {
@@ -106,9 +218,7 @@ namespace Fabrika_Otomasyonu
                             break;
 
                         case "elmMakineler":
-                            // Arıza Paneli Sayfası
                             navFrameYonetici.SelectedPage = pageMakineler;
-                            // Sayfa açılınca paneli tekrar ortalayalım (garanti olsun)
                             groupArizaBildirim.Location = new Point(
                                 (pageMakineler.Width - groupArizaBildirim.Width) / 2,
                                 (pageMakineler.Height - groupArizaBildirim.Height) / 2
@@ -122,46 +232,36 @@ namespace Fabrika_Otomasyonu
 
                         case "elmSiparisler":
                             navFrameYonetici.SelectedPage = pageSiparisler;
-                            // SiparisleriYenile(); // Sipariş kodlarını eklediysen aç
+                            SiparisleriYenile(); // ARTIK BU METOD VAR VE ÇALIŞACAK
                             break;
                     }
                 }
             };
 
-            // -----------------------------------------------------------
-            // 2. ARIZA VE SORUN BİLDİRİM PANELİ (GÜNCELLENMİŞ HALİ)
-            // -----------------------------------------------------------
-
-            // A) Sorun Tipi Seçilince: Yazılar ve İpuçları Değişsin
+            // ARIZA PANELİ OLAYLARI
             cmbSorunTipi.SelectedIndexChanged += (s, e) =>
             {
-                // Kutuları her halükarda görünür yap
                 lblArizaMakine.Visible = true;
                 txtArizaMakine.Visible = true;
 
                 if (cmbSorunTipi.Text == "Makine Arızası")
                 {
-                    // Makine seçildiyse
                     lblArizaMakine.Text = "Arızalı Makine Adı:";
-                    txtArizaMakine.Properties.NullValuePrompt = "Örn: Kesim Makinesi 2"; // İpucu
+                    txtArizaMakine.Properties.NullValuePrompt = "Örn: Kesim Makinesi 2";
                 }
                 else
                 {
-                    // Diğer sorun seçildiyse
-                    lblArizaMakine.Text = "Sorun Başlığı:"; // Etiket değişti
-                    txtArizaMakine.Properties.NullValuePrompt = ""; // İpucu kalktı
+                    lblArizaMakine.Text = "Sorun Başlığı:";
+                    txtArizaMakine.Properties.NullValuePrompt = "";
                 }
-
-                // İçini temizle ki eski yazı kalmasın
                 txtArizaMakine.Text = "";
-                OtomatikMesajOlustur(); // Mesajı da güncelle
+                OtomatikMesajOlustur();
             };
 
-            // B) Makine Adı Yazıldıkça veya Süre Seçildikçe Mesajı Güncelle
             txtArizaMakine.EditValueChanged += (s, e) => OtomatikMesajOlustur();
             cmbSure.SelectedIndexChanged += (s, e) => OtomatikMesajOlustur();
 
-            // C) BİLDİRİM GÖNDER BUTONU
+            // BİLDİRİM GÖNDER BUTONU
             btnBildirimGonder.Click += (s, e) =>
             {
                 if (string.IsNullOrEmpty(memoOzurMesaji.Text))
@@ -170,29 +270,28 @@ namespace Fabrika_Otomasyonu
                     return;
                 }
 
-                if (XtraMessageBox.Show("Bu bildirim yayınlansın mı?", "Onay", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (XtraMessageBox.Show("Bu bildirim tüm müşterilere yayınlansın mı?", "Onay", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    bildirimYonetim.BildirimGonder("⚠️ Fabrika Durum Bildirimi", memoOzurMesaji.Text);
+                    // Başlık, seçilen sorun tipine göre olsun
+                    string baslik = cmbSorunTipi.Text == "Makine Arızası" ? "⚠️ Üretim Arıza Bildirimi" : "ℹ️ Genel Bilgilendirme";
 
-                    XtraMessageBox.Show("Bildirim başarıyla yayınlandı.", "Başarılı");
+                    // VERİTABANINA KAYDET
+                    bildirimYonetim.BildirimGonder(baslik, memoOzurMesaji.Text);
+
+                    XtraMessageBox.Show("Bildirim başarıyla yayınlandı! Müşteriler giriş yaptıklarında görecekler.", "Başarılı");
 
                     // Temizle
                     memoOzurMesaji.Text = "";
                     cmbSure.SelectedIndex = -1;
                     txtArizaMakine.Text = "";
                     cmbSorunTipi.SelectedIndex = -1;
-
-                    // Paneli eski haline getir (Gizle)
                     lblArizaMakine.Visible = false;
                     txtArizaMakine.Visible = false;
                 }
+                siparisYonetimi.TumTarihleriGuncelle();
             };
 
-            // -----------------------------------------------------------
-            // 3. DİĞER BUTONLAR (ÜRÜN VE HAMMADDE)
-            // -----------------------------------------------------------
-
-            // Resim Seçme
+            // RESİM SEÇME
             peUrunResim.Click += (s, e) =>
             {
                 using (OpenFileDialog ofd = new OpenFileDialog())
@@ -202,7 +301,7 @@ namespace Fabrika_Otomasyonu
                 }
             };
 
-            // Hammadde Tür Seçimi (Birim Ayarı)
+            // HAMMADDE TÜR SEÇİMİ
             cmbHamTur.SelectedIndexChanged += (s, e) =>
             {
                 if (cmbHamTur.EditValue == null) return;
@@ -211,18 +310,18 @@ namespace Fabrika_Otomasyonu
                 cmbHamBirim.Enabled = false;
             };
 
-            // Buton Tıklamalarını Metodlara Bağla
+            // BUTONLARI BAĞLA
             btnRenkEkle.Click += BtnRenkEkle_Click;
             btnUrunKaydet.Click += BtnUrunKaydet_Click;
             btnUrunKaldir.Click += BtnUrunKaldir_Click;
             btnHammaddeEkle.Click += BtnHammaddeEkle_Click;
         }
 
-        // ... Buton Click Metodları (BtnUrunKaldir_Click vs.) AYNI ...
+        // --- BUTON CLICK METODLARI ---
+
         private void BtnUrunKaldir_Click(object sender, EventArgs e)
         {
-            var row = gvUrunListesi.GetFocusedDataRow(); // Seçili satırı al
-
+            var row = gvUrunListesi.GetFocusedDataRow();
             if (row == null)
             {
                 XtraMessageBox.Show("Lütfen silinecek ürünü listeden seçin!");
@@ -234,8 +333,8 @@ namespace Fabrika_Otomasyonu
                 try
                 {
                     int id = Convert.ToInt32(row["Id"]);
-                    urunYonetim.UrunSil(id); // Veritabanından sil
-                    UrunListesiniYenile(); // Listeyi güncelle
+                    urunYonetim.UrunSil(id);
+                    UrunListesiniYenile();
                     XtraMessageBox.Show("Ürün silindi.");
                 }
                 catch (Exception ex)
@@ -247,37 +346,61 @@ namespace Fabrika_Otomasyonu
 
         private void BtnRenkEkle_Click(object sender, EventArgs e)
         {
-            if (cmbRenkSec.EditValue == null) { XtraMessageBox.Show("Renk seçiniz!"); return; }
+            // 1. Renk seçili mi kontrolü (Eski kodun)
+            if (cmbRenkSec.EditValue == null)
+            {
+                XtraMessageBox.Show("Lütfen bir renk seçiniz!");
+                return;
+            }
+
+            string secilenRenk = cmbRenkSec.Text;
+
+            // 2. YENİ EKLENEN KISIM: Bu renk listede zaten var mı?
+            // System.Linq kütüphanesini kullanıyoruz
+            bool renkZatenVar = eklenecekVaryantlar.Exists(x => x.Renk == secilenRenk);
+
+            if (renkZatenVar)
+            {
+                XtraMessageBox.Show($"'{secilenRenk}' rengi zaten listeye eklenmiş! Aynı rengi tekrar ekleyemezsin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return; // İşlemi durdur, ekleme yapma
+            }
+
+            // 3. Sorun yoksa ekle (Eski kodun devamı)
             var resim = peUrunResim.Image;
-            var yeni = new GeciciVaryant { Renk = cmbRenkSec.Text, GorselResim = resim, ResimData = urunYonetim.ResimToByte(resim) };
+
+            // Resmi byte'a çeviriyoruz
+            var yeni = new GeciciVaryant
+            {
+                Renk = secilenRenk,
+                GorselResim = resim,
+                ResimData = urunYonetim.ResimToByte(resim)
+            };
+
             eklenecekVaryantlar.Add(yeni);
             lstEklenenVaryantlar.Items.Add($"{yeni.Renk} - [Görsel: {(resim != null ? "Var" : "Yok")}]");
-            peUrunResim.Image = null; cmbRenkSec.SelectedIndex = -1;
+
+            // Temizlik
+            peUrunResim.Image = null;
+            cmbRenkSec.SelectedIndex = -1;
         }
 
         private void BtnUrunKaydet_Click(object sender, EventArgs e)
         {
-            // Kontroller
             if (string.IsNullOrEmpty(txtUrunModel.Text)) { XtraMessageBox.Show("Model adı boş olamaz!"); return; }
             if (string.IsNullOrEmpty(txtUrunFiyat.Text)) { XtraMessageBox.Show("Fiyat girmediniz!"); return; }
 
             try
             {
-                // Fiyat metnini sayıya çevir (TL işaretini temizler)
                 decimal fiyat = Convert.ToDecimal(txtUrunFiyat.EditValue);
-
-                // Parametreleri gönder
                 urunYonetim.UrunEkle(
                     txtUrunModel.Text,
                     cmbUrunTur.Text,
                     cmbHammaddeTur.Text,
-                    fiyat, // YENİ
+                    fiyat,
                     eklenecekVaryantlar
                 );
 
                 XtraMessageBox.Show("Ürün başarıyla kaydedildi.");
-
-                // Temizlik ve Yenileme
                 FormuTemizle();
                 UrunListesiniYenile();
             }
@@ -301,53 +424,48 @@ namespace Fabrika_Otomasyonu
             }
             catch (Exception ex) { XtraMessageBox.Show(ex.Message); }
         }
+
+        // --- YARDIMCI METODLAR ---
+
         private void OtomatikMesajOlustur()
         {
-            // Verileri al
             string tip = cmbSorunTipi.Text;
             string sure = cmbSure.Text;
-            string girilenYazi = txtArizaMakine.Text; // Hem makine adı hem de sorun başlığı burası
+            string girilenYazi = txtArizaMakine.Text;
 
-            // Eğer tip seçilmediyse işlem yapma
             if (string.IsNullOrEmpty(tip)) return;
 
             string mesaj = "";
 
             if (tip == "Makine Arızası")
             {
-                // Makine adı boşsa "bir makinemiz", doluysa "'Kesim Makinesi'" yazar
                 string makineAdi = string.IsNullOrEmpty(girilenYazi) ? "bir makinemiz" : $"'{girilenYazi}'";
-
                 mesaj = $"Sayın Müşterimiz,\n\nFabrikamızdaki {makineAdi} üzerinde yaşanan teknik bir arıza sebebiyle üretim planımızda aksamalar olmuştur.\n\nSiparişlerinizin teslimatı tahmini olarak {sure} gecikecektir.\n\nAnlayışınız için teşekkür ederiz.";
             }
-            else // Diğer Sorun
+            else
             {
-                // BURAYI DÜZELTTİK: Senin yazdığın yazıyı mesaja ekliyoruz
-                // Eğer boşsa "genel aksaklık" yazar, doluysa senin yazdığını (örn: Fabrika genel izin) yazar.
                 string sebep = string.IsNullOrEmpty(girilenYazi) ? "genel teknik aksaklıklar" : $"'{girilenYazi}'";
-
                 mesaj = $"Sayın Müşterimiz,\n\nFabrikamızda yaşanan durum {sebep} nedeniyle üretim süreçlerimizde geçici yavaşlama olmuştur.\n\nSiparişlerinizde {sure} kadar gecikme yaşanabilir.\n\nAnlayışınız için teşekkür ederiz.";
             }
-
-            // Mesajı kutuya bas
             memoOzurMesaji.Text = mesaj;
         }
 
-        private void UrunListesiniYenile() 
-        { gcUrunListesi.DataSource = urunYonetim.UrunleriGetir(); 
-            gvUrunListesi.BestFitColumns(); 
+        private void UrunListesiniYenile()
+        {
+            gcUrunListesi.DataSource = urunYonetim.UrunleriGetir();
+            gvUrunListesi.BestFitColumns();
         }
-        private void HammaddeListesiniYenile() 
-        { 
-            gcHammaddeListesi.DataSource = hammaddeYonetim.HammaddeleriGetir(); 
-            gvHammaddeListesi.BestFitColumns(); 
+
+        private void HammaddeListesiniYenile()
+        {
+            gcHammaddeListesi.DataSource = hammaddeYonetim.HammaddeleriGetir();
+            gvHammaddeListesi.BestFitColumns();
         }
+
         private void FormuTemizle()
         {
-            
-        
             txtUrunModel.Text = "";
-            txtUrunFiyat.Text = ""; // Fiyatı temizle
+            txtUrunFiyat.Text = "";
             cmbUrunTur.SelectedIndex = -1;
             cmbHammaddeTur.SelectedIndex = -1;
             lstEklenenVaryantlar.Items.Clear();

@@ -16,6 +16,11 @@ namespace Fabrika_Otomasyonu
         // YÖNETİM SINIFLARI
         VitrinYonetimi vitrinYonetim = new VitrinYonetimi();
         SiparisYonetimi siparisYonetimi = new SiparisYonetimi();
+        string aktifMusteriAd = "";
+        string aktifMusteriTel = "";
+        string aktifMusteriAdres = "";
+        MusteriYonetimi musteriYonetimi = new MusteriYonetimi();
+        BildirimYonetimi bildirimYonetim = new BildirimYonetimi();
 
         // SEPET LİSTESİ
         BindingList<SepetOgesi> sepetListesi = new BindingList<SepetOgesi>();
@@ -28,11 +33,16 @@ namespace Fabrika_Otomasyonu
         // HAFIZA
         Dictionary<string, byte[]> varyantHafiza = new Dictionary<string, byte[]>();
 
+
+        // Adres Kutusu Tanımlaması
+        DevExpress.XtraEditors.MemoEdit memoAdres;
+
         public FrmMusteri()
         {
             InitializeComponent();
             BaslangicAyarlari();
             OlaylariBagla();
+            this.FormClosed += (s, e) => Application.Exit();
         }
 
         private void BaslangicAyarlari()
@@ -41,14 +51,22 @@ namespace Fabrika_Otomasyonu
 
             // 1. Verileri Yükle
             gcUrunVitrin.DataSource = vitrinYonetim.VitrinListesiGetir();
-            gcSiparisTakip.DataSource = siparisYonetimi.SiparisleriGetir();
-
+            gcSiparisTakip.DataSource = siparisYonetimi.MusteriSiparisleriniGetir(aktifMusteriTel);
             // Sepet grid'i bağla
             gcSepet.DataSource = sepetListesi;
+            
 
             // 2. Sağ Paneli Temizle
             TemizleSagPanel();
             SepetiGuncelle();
+
+            // --- YENİ EKLENDİ: Başlangıçta Header İsmi Doğru Gelsin ---
+            lblHeader.Text = elmKatalog.Text;
+            AdresKutusunuOlustur();
+
+
+            SepetSayfasiDuzenle();
+            BildirimKontrol();
         }
 
         private void ConfigureTileView()
@@ -121,6 +139,10 @@ namespace Fabrika_Otomasyonu
             // --- 1. MENÜ GEÇİŞLERİ ---
             accordionControl1.ElementClick += (s, e) =>
             {
+                // --- YENİ EKLENDİ: Başlığı Güncelle ---
+                // Tıklanan menü elemanının ismini alıp yukarıya yazıyoruz.
+                lblHeader.Text = e.Element.Text;
+
                 if (e.Element == elmKatalog)
                 {
                     navFrameMusteri.SelectedPage = pageKatalog;
@@ -171,7 +193,6 @@ namespace Fabrika_Otomasyonu
                 string secilenRenk = cmbVaryant.Text;
                 if (varyantHafiza.ContainsKey(secilenRenk))
                 {
-                    // YENİ GÜVENLİ METODU KULLANIYORUZ
                     Image yeniResim = ByteToImage(varyantHafiza[secilenRenk]);
                     ResmiKutuyaKoy(yeniResim);
                 }
@@ -192,23 +213,28 @@ namespace Fabrika_Otomasyonu
                     return;
                 }
 
+                // Grid'den o anki ürünün hammadde bilgisini çekiyoruz (Null kontrolü ile)
+                var row = tvUrunVitrin.GetRow(tvUrunVitrin.FocusedRowHandle) as DataRowView;
+                string hammadde = row != null ? row["AnaHammadde"].ToString() : "Standart";
+
+                // Resmin kopyasını (Clone) alıyoruz ki ekrandan silinince sepetten gitmesin
+                Image sepetResmi = null;
+                if (peSeciliResim.Image != null) sepetResmi = new Bitmap(peSeciliResim.Image);
+
                 SepetOgesi yeniOge = new SepetOgesi
                 {
                     UrunId = seciliUrunId,
                     ModelAd = seciliModelAd,
+                    AnaHammadde = hammadde, // <-- Artık grid'den aldığımız veriyi koyuyoruz
                     Renk = cmbVaryant.Text,
                     TakimSayisi = Convert.ToInt32(txtAdet.Value),
                     BirimFiyat = seciliTakimFiyati,
                     ToplamTutar = seciliTakimFiyati * Convert.ToInt32(txtAdet.Value),
-                    UrunResmi = peSeciliResim.Image // Mevcut resmi alıyoruz
+                    UrunResmi = sepetResmi
                 };
 
                 sepetListesi.Add(yeniOge);
                 XtraMessageBox.Show("Sepete eklendi!", "Başarılı");
-
-                // Sepete ekledikten sonra paneli tamamen temizleme ki müşteri art arda ekleyebilsin
-                // Sadece adeti sıfırlayabilirsin veya böyle bırakabilirsin.
-                // TemizleSagPanel(); // <- Bunu kaldırdım, kullanıcı aynı üründen farklı renk seçebilsin diye.
                 SepetiGuncelle();
             };
 
@@ -218,18 +244,49 @@ namespace Fabrika_Otomasyonu
             btnSepetiOnayla.Click += (s, e) =>
             {
                 if (sepetListesi.Count == 0) return;
+
+                if (string.IsNullOrEmpty(memoAdres.Text) || memoAdres.Text.Length < 5)
+                {
+                    XtraMessageBox.Show("Lütfen teslimat adresinizi giriniz!", "Eksik Bilgi");
+                    return;
+                }
+
                 if (XtraMessageBox.Show("Siparişi onaylıyor musunuz?", "Onay", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
+                    musteriYonetimi.MusteriKaydetVeyaGuncelle(aktifMusteriAd, aktifMusteriTel, memoAdres.Text);
+                    aktifMusteriAdres = memoAdres.Text;
+
+                    // --- ÖNEMLİ: TEK BİR SİPARİŞ KODU OLUŞTURUYORUZ ---
+                    // Örn: "SIP-A1B2" gibi rastgele bir kod
+                    string grupKodu = "SIP-" + Guid.NewGuid().ToString().Substring(0, 4).ToUpper();
+
                     foreach (var item in sepetListesi)
                     {
                         string tamAd = $"{item.ModelAd} ({item.Renk}) - [TAKIM]";
-                        siparisYonetimi.SiparisOlustur("Misafir Müşteri", tamAd, item.TakimSayisi, item.BirimFiyat);
+
+                        // Hepsine aynı 'grupKodu'nu gönderiyoruz
+                        siparisYonetimi.SiparisOlustur(
+                            aktifMusteriAd,
+                            aktifMusteriTel,
+                            tamAd,
+                            item.TakimSayisi,
+                            item.BirimFiyat,
+                            memoAdres.Text,
+                            grupKodu // <-- ORTAK KOD
+                        );
                     }
+
+                    // Sipariş oluştu, şimdi tarihleri GRUP BAZLI hesapla
+                    siparisYonetimi.TumTarihleriGuncelle();
+
                     sepetListesi.Clear();
                     SepetiGuncelle();
-                    XtraMessageBox.Show("Sipariş alındı!", "Teşekkürler");
+                    memoAdres.Text = "";
+                    XtraMessageBox.Show("Siparişiniz tek paket olarak alındı!", "Teşekkürler");
+
                     navFrameMusteri.SelectedPage = pageTakip;
-                    gcSiparisTakip.DataSource = siparisYonetimi.SiparisleriGetir();
+                    if (!string.IsNullOrEmpty(aktifMusteriTel))
+                        gcSiparisTakip.DataSource = siparisYonetimi.MusteriSiparisleriniGetir(aktifMusteriTel);
                 }
             };
 
@@ -240,29 +297,22 @@ namespace Fabrika_Otomasyonu
             };
         }
 
-        // --- KRİTİK YARDIMCI METODLAR ---
+        // --- YARDIMCI METODLAR ---
 
-        // Hafızayı şişirmemek için eski resmi silip yenisini koyan metod
         private void ResmiKutuyaKoy(Image yeniResim)
         {
-            // Eski resim varsa hafızadan at
             if (peSeciliResim.Image != null)
             {
                 peSeciliResim.Image.Dispose();
             }
-
             peSeciliResim.Image = yeniResim;
         }
 
         private void VaryantlariDoldur(int id)
         {
-            // Güncelleme sırasında ekran titremesin
             cmbVaryant.Properties.Items.BeginUpdate();
             cmbVaryant.Properties.Items.Clear();
-
-            // Resmi de güvenli temizle
             ResmiKutuyaKoy(null);
-
             varyantHafiza.Clear();
 
             DataTable dt = vitrinYonetim.UrunDetaylariniGetir(id);
@@ -274,15 +324,11 @@ namespace Fabrika_Otomasyonu
                 cmbVaryant.Properties.Items.Add(renk);
                 if (resim != null) varyantHafiza.Add(renk, resim);
             }
-            cmbVaryant.Properties.Items.EndUpdate(); // Güncellemeyi bitir
+            cmbVaryant.Properties.Items.EndUpdate();
 
             if (cmbVaryant.Properties.Items.Count > 0)
             {
                 cmbVaryant.SelectedIndex = 0;
-
-                // EKSTRA GÜVENLİK: 
-                // Index değişimi bazen tetiklenmeyebilir (zaten 0 ise),
-                // bu yüzden seçili rengin resmini burada ELLE yüklüyoruz.
                 string ilkRenk = cmbVaryant.Properties.Items[0].ToString();
                 if (varyantHafiza.ContainsKey(ilkRenk))
                 {
@@ -309,7 +355,7 @@ namespace Fabrika_Otomasyonu
         {
             seciliUrunId = 0;
             lblUrunBaslik.Text = "Ürün Seçiniz";
-            ResmiKutuyaKoy(null); // Güvenli temizleme
+            ResmiKutuyaKoy(null);
             cmbVaryant.Properties.Items.Clear();
             cmbVaryant.Text = "";
             txtAdet.Value = 1;
@@ -321,7 +367,6 @@ namespace Fabrika_Otomasyonu
             if (data == null || data.Length < 100) return null;
             try
             {
-                // Stream açık kalmalı, using kullanmıyoruz.
                 MemoryStream ms = new MemoryStream(data);
                 return Image.FromStream(ms);
             }
@@ -364,6 +409,125 @@ namespace Fabrika_Otomasyonu
         private void cmbKategoriFiltre_Click(object sender, EventArgs e)
         {
             try { if (cmbKategoriFiltre != null) cmbKategoriFiltre.ShowPopup(); } catch { }
+        }
+        public FrmMusteri(string ad, string tel ,string adres)
+        {
+            InitializeComponent();
+
+            // Gelen bilgileri hafızaya al
+            aktifMusteriAd = ad;
+            aktifMusteriTel = tel;
+            aktifMusteriAdres = adres;  
+
+            BaslangicAyarlari();
+            OlaylariBagla();
+        }
+        private void AdresKutusunuOlustur()
+        {
+            // 1. Etiket
+            LabelControl lblAdresBaslik = new LabelControl();
+            lblAdresBaslik.Text = "Teslimat Adresi:";
+            lblAdresBaslik.Location = new Point(20, gcSepet.Bottom + 20); // Gridin altına koy
+            lblAdresBaslik.Appearance.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+            pageSepet.Controls.Add(lblAdresBaslik);
+
+            // 2. Adres Kutusu (MemoEdit)
+            memoAdres = new MemoEdit();
+            memoAdres.Location = new Point(20, gcSepet.Bottom + 45);
+            memoAdres.Size = new Size(400, 80);
+            memoAdres.Properties.NullValuePrompt = "Lütfen açık adresinizi buraya giriniz...";
+            pageSepet.Controls.Add(memoAdres);
+        }
+        private void SepetSayfasiDuzenle()
+        {
+            // 1. Alt Panel Oluştur (Adres ve Butonlar için)
+            PanelControl pnlAlt = new PanelControl();
+            pnlAlt.Dock = DockStyle.Bottom; // Sayfanın en altına yapış
+            pnlAlt.Height = 130;            // Yüksekliği ayarla
+            pnlAlt.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            pageSepet.Controls.Add(pnlAlt);
+
+            // Paneli öne getir ki Grid arkada kalsın
+            pnlAlt.BringToFront();
+
+            // 2. Mevcut Butonları ve Toplam Yazısını Bu Panele Taşı
+            // (Böylece butonlar kaybolmaz, panelin içinde durur)
+            btnSepetiOnayla.Parent = pnlAlt;
+            btnSepetiTemizle.Parent = pnlAlt;
+            lblSepetToplam.Parent = pnlAlt;
+
+            // Butonların Yerlerini Ayarla (Sağ Alt Köşe)
+            btnSepetiOnayla.Location = new Point(pnlAlt.Width - 220, 70);
+            btnSepetiOnayla.Anchor = AnchorStyles.Bottom | AnchorStyles.Right; // Ekran büyürse sağda kalsın
+
+            btnSepetiTemizle.Location = new Point(pnlAlt.Width - 220, 20);
+            btnSepetiTemizle.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            lblSepetToplam.Location = new Point(pnlAlt.Width - 400, 80);
+            lblSepetToplam.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            // 3. Adres Kutusunu Ekle
+            LabelControl lblAdres = new LabelControl();
+            lblAdres.Text = "Teslimat Adresi ve Notlar:";
+            lblAdres.Location = new Point(10, 10);
+            lblAdres.Appearance.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            pnlAlt.Controls.Add(lblAdres);
+
+            memoAdres = new MemoEdit();
+            memoAdres.Parent = pnlAlt; // Panele ekle
+            memoAdres.Location = new Point(10, 30);
+            memoAdres.Size = new Size(400, 80); // Genişlik ve Yükseklik
+            memoAdres.Properties.NullValuePrompt = "Açık adresinizi ve kargo notunuzu buraya giriniz...";
+
+            if (!string.IsNullOrEmpty(aktifMusteriAdres))
+            {
+                memoAdres.Text = aktifMusteriAdres;
+            }
+            // 4. Grid'i Kalan Boşluğa Yay (Fill)
+            gcSepet.Dock = DockStyle.Fill;
+            gcSepet.BringToFront(); // Grid öne gelsin ama Dock olduğu için paneli ezmez, üstüne oturur.
+        }
+        private void BildirimKontrol()
+        {
+            // 1. Son bildirimi çek
+            string[] gelenBildirim = bildirimYonetim.SonBildirimiGetir();
+
+            if (gelenBildirim != null)
+            {
+                string baslik = gelenBildirim[0];
+                string mesaj = gelenBildirim[1];
+
+                // --- MANTIK KONTROLÜ (YENİ EKLENDİ) ---
+
+                // Eğer bildirim bir "Arıza" veya "Makine" ile ilgiliyse kontrol et
+                if (baslik.Contains("Arıza") || baslik.Contains("Makine") || mesaj.Contains("gecikecektir"))
+                {
+                    // Müşterinin mevcut siparişlerini getir
+                    DataTable dtSiparisler = siparisYonetimi.MusteriSiparisleriniGetir(aktifMusteriTel);
+
+                    bool etkilenecekSiparisVarMi = false;
+
+                    foreach (DataRow row in dtSiparisler.Rows)
+                    {
+                        string durum = row["Durum"].ToString();
+
+                        // Sadece fabrikada olan işler etkilenir
+                        if (durum == "Onay Bekliyor" || durum == "Hazırlanıyor")
+                        {
+                            etkilenecekSiparisVarMi = true;
+                            break; // Bir tane bulsak yeter, döngüden çık
+                        }
+                    }
+
+                    // Eğer fabrikada işi yoksa (Siparişi yok veya hepsi Kargoda ise)
+                    // Bu uyarıyı gösterme, metoddan çık.
+                    if (!etkilenecekSiparisVarMi) return;
+                }
+                // ---------------------------------------
+
+                // DevExpress Alert veya MessageBox ile göster
+                XtraMessageBox.Show(mesaj, baslik, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
     }
 }
