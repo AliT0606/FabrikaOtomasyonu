@@ -37,11 +37,19 @@ namespace Fabrika_Otomasyonu
         // Adres Kutusu Tanımlaması
         DevExpress.XtraEditors.MemoEdit memoAdres;
 
-        public FrmMusteri()
+        public FrmMusteri(string ad = "Misafir", string tel = "", string adres = "")
         {
             InitializeComponent();
+
+            // Değişkenleri ata
+            aktifMusteriAd = ad;
+            aktifMusteriTel = tel;
+            aktifMusteriAdres = adres;
+
             BaslangicAyarlari();
             OlaylariBagla();
+
+            // Pencere kapanınca programı komple kapat
             this.FormClosed += (s, e) => Application.Exit();
         }
 
@@ -410,18 +418,7 @@ namespace Fabrika_Otomasyonu
         {
             try { if (cmbKategoriFiltre != null) cmbKategoriFiltre.ShowPopup(); } catch { }
         }
-        public FrmMusteri(string ad, string tel ,string adres)
-        {
-            InitializeComponent();
-
-            // Gelen bilgileri hafızaya al
-            aktifMusteriAd = ad;
-            aktifMusteriTel = tel;
-            aktifMusteriAdres = adres;  
-
-            BaslangicAyarlari();
-            OlaylariBagla();
-        }
+       
         private void AdresKutusunuOlustur()
         {
             // 1. Etiket

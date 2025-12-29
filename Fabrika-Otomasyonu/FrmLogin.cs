@@ -77,6 +77,7 @@ namespace Fabrika_Otomasyonu
             // 2. Müşteri Girişi mi? (Şimdilik boş geçebiliriz veya basit kontrol)
             else if (navFrameLogin.SelectedPage == pageMusteri)
             {
+                MusteriYonetimi mYonetim = new MusteriYonetimi();
                 // Giriş bilgilerini al
                 string ad = txtMusteriAd.Text.Trim();
                 string tel = txtMusteriTelefon.Text.Trim();
@@ -86,7 +87,7 @@ namespace Fabrika_Otomasyonu
                     XtraMessageBox.Show("Lütfen adınızı ve telefon numaranızı giriniz.", "Eksik Bilgi");
                     return;
                 }
-                MusteriYonetimi mYonetim = new MusteriYonetimi();
+               
                 string kayitliAdres = mYonetim.AdresGetir(tel);
                 // Bilgileri FrmMusteri'ye göndererek aç
                 FrmMusteri fr = new FrmMusteri(ad, tel, kayitliAdres);
