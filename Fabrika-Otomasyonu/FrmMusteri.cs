@@ -145,7 +145,7 @@ namespace Fabrika_Otomasyonu
                 lblHeader.Text = e.Element.Text;
                 if (e.Element == elmKatalog) navFrameMusteri.SelectedPage = pageKatalog;
                 else if (e.Element == elmSepet) { navFrameMusteri.SelectedPage = pageSepet; SepetiGuncelle(); }
-                else if (e.Element == elmTakip) { navFrameMusteri.SelectedPage = pageTakip; gcSiparisTakip.DataSource = siparisYonetimi.SiparisleriGetir(); }
+                else if (e.Element == elmTakip){navFrameMusteri.SelectedPage = pageTakip;gcSiparisTakip.DataSource = siparisYonetimi.MusteriSiparisleriniGetir(aktifMusteriTel); }
             };
 
             // Kategori Filtresi
@@ -390,27 +390,28 @@ namespace Fabrika_Otomasyonu
 
         private void BildirimKontrol()
         {
+            // 1. Aktif bildirimi çek
             string[] gelenBildirim = bildirimYonetim.SonBildirimiGetir();
+
+            // Bildirim yoksa çık
             if (gelenBildirim == null) return;
 
-            string baslik = gelenBildirim[0];
-            string mesaj = gelenBildirim[1];
+            // Verileri ayıkla (Diziyi güncellediğimiz için indexler değişti)
+            int bildirimId = Convert.ToInt32(gelenBildirim[0]);
+            string baslik = gelenBildirim[1];
+            string mesaj = gelenBildirim[2];
 
-            // Eğer arıza bildirimi ise ve müşterinin bekleyen siparişi varsa uyar
-            if (baslik.Contains("Arıza") || baslik.Contains("Makine"))
+            // 2. KONTROL: Bu müşteri (telefon numarası) bu bildirimi daha önce gördü mü?
+            if (bildirimYonetim.OkunduMu(aktifMusteriTel, bildirimId))
             {
-                DataTable dt = siparisYonetimi.MusteriSiparisleriniGetir(aktifMusteriTel);
-                bool etkilenenVar = false;
-                foreach (DataRow row in dt.Rows)
-                {
-                    if (row["Durum"].ToString() == "Onay Bekliyor" || row["Durum"].ToString() == "Hazırlanıyor")
-                    {
-                        etkilenenVar = true; break;
-                    }
-                }
-                if (!etkilenenVar) return;
+                return; // Zaten okumuş, bir şey yapma.
             }
-            XtraMessageBox.Show(mesaj, baslik, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+            // 3. Bildirimi Göster
+            XtraMessageBox.Show(mesaj, baslik, MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            // 4. KAYDET: Müşteri bunu gördü, veritabanına işle.
+            bildirimYonetim.OkunduIsaretle(aktifMusteriTel, bildirimId);
         }
         #endregion
     }

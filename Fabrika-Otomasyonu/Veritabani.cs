@@ -64,6 +64,8 @@ namespace Fabrika_Otomasyonu
                     
                     cmd.CommandText = @"CREATE TABLE IF NOT EXISTS Bildirimler (Id INTEGER PRIMARY KEY AUTOINCREMENT, Baslik TEXT, Mesaj TEXT, Tarih DATETIME DEFAULT CURRENT_TIMESTAMP, AktifMi INTEGER DEFAULT 1);";
                     cmd.ExecuteNonQuery();
+                    cmd.CommandText = "CREATE TABLE IF NOT EXISTS OkunanBildirimler (Id INTEGER PRIMARY KEY AUTOINCREMENT, Telefon TEXT, BildirimId INTEGER);";
+                    cmd.ExecuteNonQuery();
                 }
 
                 // --- YAMA BÖLÜMÜ (Sütun Eksikse Ekle) ---
@@ -81,6 +83,8 @@ namespace Fabrika_Otomasyonu
 
                 // YENİ EKLENEN: ADRES SÜTUNU
                 try { using (var c = new SQLiteCommand("ALTER TABLE Siparisler ADD COLUMN Adres TEXT", con)) c.ExecuteNonQuery(); } catch { }
+                //bildirim süresi
+                try { using (var c = new SQLiteCommand("ALTER TABLE Bildirimler ADD COLUMN SureGun INTEGER DEFAULT 3", con)) c.ExecuteNonQuery(); } catch { }
 
                 VarsayilanVeriEkle(con);
             }

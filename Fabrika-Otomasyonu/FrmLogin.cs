@@ -105,6 +105,23 @@ namespace Fabrika_Otomasyonu
             }
 
             MusteriYonetimi mYonetim = new MusteriYonetimi();
+
+            // --- YENİ EKLENEN KONTROL ---
+            // Bu numara daha önce kayıt olmuş mu?
+            string kayitliIsim = mYonetim.IsimGetir(tel);
+
+            if (!string.IsNullOrEmpty(kayitliIsim))
+            {
+                // Numara var, peki girilen isim kayıtlı isimle aynı mı?
+                if (!kayitliIsim.Equals(ad, StringComparison.OrdinalIgnoreCase))
+                {
+                    XtraMessageBox.Show($"Bu numara '{kayitliIsim}' adına kayıtlıdır.\nFarklı bir isimle giriş yapamazsınız!",
+                        "Kimlik Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return; // Girişi engelle
+                }
+            }
+            // ----------------------------
+
             string kayitliAdres = mYonetim.AdresGetir(tel);
 
             FrmMusteri fr = new FrmMusteri(ad, tel, kayitliAdres);

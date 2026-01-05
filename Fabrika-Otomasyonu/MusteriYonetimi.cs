@@ -20,7 +20,23 @@ namespace Fabrika_Otomasyonu
             }
         }
 
-        // 2. Müşteriyi Kaydet veya Adresini Güncelle
+        // 2. Müşterinin Kayıtlı İsmini Getir
+        public string IsimGetir(string telefon)
+        {
+            using (var con = Veritabani.BaglantiGetir())
+            {
+                string sql = "SELECT AdSoyad FROM Kullanicilar WHERE Telefon = @tel";
+                using (var cmd = new SQLiteCommand(sql, con))
+                {
+                    cmd.Parameters.AddWithValue("@tel", telefon);
+                    object sonuc = cmd.ExecuteScalar();
+                    // Eğer kayıt varsa ismi döndür, yoksa null döndür
+                    return sonuc != null ? sonuc.ToString() : null;
+                }
+            }
+        }
+
+        // 3. Müşteriyi Kaydet veya Adresini Güncelle
         public void MusteriKaydetVeyaGuncelle(string adSoyad, string telefon, string adres)
         {
             using (var con = Veritabani.BaglantiGetir())
