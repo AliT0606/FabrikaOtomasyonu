@@ -4,18 +4,24 @@ using System.Data.SQLite;
 
 namespace Fabrika_Otomasyonu
 {
+    /// <summary>
+    /// Yönetici ve müşteriler arasındaki duyuru/bildirim sistemini yönetir.
+    /// </summary>
     public class BildirimYonetimi
     {
-        // 1. YENİ BİLDİRİM YAYINLA (Yönetici İçin)
+        /// <summary>
+        /// Yeni bir duyuru yayınlar. 
+        /// ÖNEMLİ: Aynı anda sadece bir aktif duyuru olabilir. Eskiler pasife çekilir.
+        /// </summary>
         public void BildirimGonder(string baslik, string mesaj)
         {
             using (var con = Veritabani.BaglantiGetir())
             {
-                // Önce eski aktif bildirimleri pasif yap (Sadece en sonuncusu görünsün)
+                // 1. Önceki aktif bildirimleri temizle (Arşivle)
                 string pasifSql = "UPDATE Bildirimler SET AktifMi = 0";
                 using (var cmd = new SQLiteCommand(pasifSql, con)) cmd.ExecuteNonQuery();
 
-                // Yeni bildirimi ekle
+                // 2. Yeni bildirimi 'Aktif' olarak ekle
                 string ekleSql = "INSERT INTO Bildirimler (Baslik, Mesaj, AktifMi, Tarih) VALUES (@baslik, @mesaj, 1, @tarih)";
                 using (var cmd = new SQLiteCommand(ekleSql, con))
                 {
@@ -27,13 +33,14 @@ namespace Fabrika_Otomasyonu
             }
         }
 
-        // 2. SON AKTİF BİLDİRİMİ GETİR (Müşteri İçin)
-        // Dönüş Tipi: string array [Baslik, Mesaj]
+        /// <summary>
+        /// Müşteri ekranında gösterilecek son aktif bildirimi çeker.
+        /// </summary>
+        /// <returns>Dizi: [0] Başlık, [1] Mesaj. Yoksa null döner.</returns>
         public string[] SonBildirimiGetir()
         {
             using (var con = Veritabani.BaglantiGetir())
             {
-                // Son 24 saat içinde atılmış aktif bir mesaj var mı?
                 string sql = "SELECT Baslik, Mesaj FROM Bildirimler WHERE AktifMi = 1 ORDER BY Id DESC LIMIT 1";
 
                 using (var cmd = new SQLiteCommand(sql, con))
@@ -47,7 +54,7 @@ namespace Fabrika_Otomasyonu
                     }
                 }
             }
-            return null; // Bildirim yoksa null döner
+            return null;
         }
     }
 }

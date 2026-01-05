@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data.SQLite; // SQLite kütüphanesini eklemeyi unutma
+using System.Data.SQLite;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
 
@@ -12,17 +12,19 @@ namespace Fabrika_Otomasyonu
             InitializeComponent();
         }
 
-        // Form Yüklendiğinde
         private void LoginScreen_Load(object sender, EventArgs e)
         {
-            // Şifre kutusunun karakterini gizle
+            // Şifre kutusunun karakterini gizle (● şeklinde görünür)
             txtYoneticiSifre.Properties.UseSystemPasswordChar = true;
         }
 
-        // GİRİŞ YAP BUTONU
+        // ============================================================
+        // BUTON OLAYLARI (GİRİŞ İŞLEMLERİ)
+        // ============================================================
+
         private void btnGirisYap_Click_New(object sender, EventArgs e)
         {
-            // 1. Yönetici Girişi mi Seçili? (NavFrame kontrolü)
+            // SENARYO 1: YÖNETİCİ GİRİŞİ
             if (navFrameLogin.SelectedPage == pageYonetici)
             {
                 string kadi = txtYoneticiAdi.Text.Trim();
@@ -30,96 +32,115 @@ namespace Fabrika_Otomasyonu
 
                 if (string.IsNullOrEmpty(kadi) || string.IsNullOrEmpty(sifre))
                 {
-                    XtraMessageBox.Show("Lütfen kullanıcı adı ve şifreyi giriniz.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    XtraMessageBox.Show("Lütfen kullanıcı adı ve şifreyi giriniz.", "Eksik Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                try
+                // Giriş kontrolünü yardımcı metoda yaptırıyoruz
+                if (YoneticiGirisKontrol(kadi, sifre, out string adSoyad))
                 {
-                    // VERİTABANI KONTROLÜ
-                    using (var baglanti = Veritabani.BaglantiGetir())
-                    {
-                        // Bağlantı zaten açık geliyor (Veritabani sınıfında açmıştık), tekrar açmaya gerek yok.
+                    XtraMessageBox.Show($"Hoşgeldin {adSoyad}", "Giriş Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                        string sql = "SELECT * FROM Kullanicilar WHERE KullaniciAdi=@p1 AND Sifre=@p2 AND Rol='Yonetici'";
-                        using (var cmd = new SQLiteCommand(sql, baglanti))
-                        {
-                            cmd.Parameters.AddWithValue("@p1", kadi);
-                            cmd.Parameters.AddWithValue("@p2", sifre);
-
-                            using (var dr = cmd.ExecuteReader())
-                            {
-                                if (dr.Read())
-                                {
-                                    // Giriş Başarılı!
-                                    XtraMessageBox.Show($"Hoşgeldin {dr["AdSoyad"]}", "Giriş Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                                    // Yönetici Ekranını Aç
-                                    FrmYonetici frm = new FrmYonetici();
-                                    frm.Show();
-
-                                    // Login ekranını gizle
-                                    this.Hide();
-                                }
-                                else
-                                {
-                                    XtraMessageBox.Show("Hatalı Kullanıcı Adı veya Şifre!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                }
-                            }
-                        }
-                    }
+                    FrmYonetici frm = new FrmYonetici();
+                    frm.Show();
+                    this.Hide();
                 }
-                catch (Exception ex)
+                else
                 {
-                    XtraMessageBox.Show("Veritabanı hatası: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    XtraMessageBox.Show("Hatalı Kullanıcı Adı veya Şifre!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            // 2. Müşteri Girişi mi? (Şimdilik boş geçebiliriz veya basit kontrol)
+            // SENARYO 2: MÜŞTERİ GİRİŞİ
             else if (navFrameLogin.SelectedPage == pageMusteri)
             {
-                MusteriYonetimi mYonetim = new MusteriYonetimi();
-                // Giriş bilgilerini al
-                string ad = txtMusteriAd.Text.Trim();
-                string tel = txtMusteriTelefon.Text.Trim();
-
-                if (string.IsNullOrEmpty(ad) || string.IsNullOrEmpty(tel))
-                {
-                    XtraMessageBox.Show("Lütfen adınızı ve telefon numaranızı giriniz.", "Eksik Bilgi");
-                    return;
-                }
-               
-                string kayitliAdres = mYonetim.AdresGetir(tel);
-                // Bilgileri FrmMusteri'ye göndererek aç
-                FrmMusteri fr = new FrmMusteri(ad, tel, kayitliAdres);
-                fr.Show();
-                this.Hide();
+                MusteriGirisYap();
             }
         }
 
-        // Şifre Göster/Gizle Butonu (Göz İkonu)
+        // ============================================================
+        // YARDIMCI METOTLAR (İŞ MANTIĞI)
+        // ============================================================
+
+        /// <summary>
+        /// Veritabanından yönetici bilgilerini kontrol eder.
+        /// </summary>
+        private bool YoneticiGirisKontrol(string kadi, string sifre, out string adSoyad)
+        {
+            adSoyad = "";
+            try
+            {
+                using (var baglanti = Veritabani.BaglantiGetir())
+                {
+                    string sql = "SELECT AdSoyad FROM Kullanicilar WHERE KullaniciAdi=@p1 AND Sifre=@p2 AND Rol='Yonetici'";
+                    using (var komut = new SQLiteCommand(sql, baglanti))
+                    {
+                        komut.Parameters.AddWithValue("@p1", kadi);
+                        komut.Parameters.AddWithValue("@p2", sifre);
+
+                        object sonuc = komut.ExecuteScalar();
+                        if (sonuc != null)
+                        {
+                            adSoyad = sonuc.ToString();
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show("Veritabanı hatası: " + ex.Message);
+            }
+            return false;
+        }
+
+        private void MusteriGirisYap()
+        {
+            string ad = txtMusteriAd.Text.Trim();
+            string tel = txtMusteriTelefon.Text.Trim();
+
+            if (string.IsNullOrEmpty(ad) || string.IsNullOrEmpty(tel))
+            {
+                XtraMessageBox.Show("Lütfen adınızı ve telefon numaranızı giriniz.", "Eksik Bilgi");
+                return;
+            }
+
+            MusteriYonetimi mYonetim = new MusteriYonetimi();
+            string kayitliAdres = mYonetim.AdresGetir(tel);
+
+            FrmMusteri fr = new FrmMusteri(ad, tel, kayitliAdres);
+            fr.Show();
+            this.Hide();
+        }
+
+        // ============================================================
+        // GÖRSEL EFEKTLER VE GEÇİŞLER
+        // ============================================================
+
         private void btnSifreGoster_MouseDown_New(object sender, MouseEventArgs e)
         {
-            txtYoneticiSifre.Properties.UseSystemPasswordChar = false;
+            txtYoneticiSifre.Properties.UseSystemPasswordChar = false; // Şifreyi göster
         }
 
         private void btnSifreGoster_MouseUp_New(object sender, MouseEventArgs e)
         {
-            txtYoneticiSifre.Properties.UseSystemPasswordChar = true;
+            txtYoneticiSifre.Properties.UseSystemPasswordChar = true; // Şifreyi gizle
         }
 
-        // Üst butonlar (Geçişler)
         private void btnSecimYonetici_Click_New(object sender, EventArgs e)
         {
-            navFrameLogin.SelectedPage = pageYonetici;
-            btnSecimYonetici.Appearance.ForeColor = System.Drawing.Color.Cyan;
-            btnSecimMusteri.Appearance.ForeColor = System.Drawing.Color.DarkGray;
+            SayfaDegistir(pageYonetici, btnSecimYonetici, btnSecimMusteri);
         }
 
         private void btnSecimMusteri_Click_New(object sender, EventArgs e)
         {
-            navFrameLogin.SelectedPage = pageMusteri;
-            btnSecimMusteri.Appearance.ForeColor = System.Drawing.Color.Cyan;
-            btnSecimYonetici.Appearance.ForeColor = System.Drawing.Color.DarkGray;
+            SayfaDegistir(pageMusteri, btnSecimMusteri, btnSecimYonetici);
+        }
+
+        private void SayfaDegistir(DevExpress.XtraBars.Navigation.NavigationPage sayfa, SimpleButton aktifButon, SimpleButton pasifButon)
+        {
+            navFrameLogin.SelectedPage = sayfa;
+            aktifButon.Appearance.ForeColor = System.Drawing.Color.Cyan;
+            pasifButon.Appearance.ForeColor = System.Drawing.Color.DarkGray;
         }
     }
 }

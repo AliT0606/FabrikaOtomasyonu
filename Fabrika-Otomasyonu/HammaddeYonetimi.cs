@@ -4,9 +4,14 @@ using System.Data.SQLite;
 
 namespace Fabrika_Otomasyonu
 {
+    /// <summary>
+    /// Hammadde stok takibi ve güncelleme işlemlerini yönetir.
+    /// </summary>
     public class HammaddeYonetimi
     {
-        // 1. Stok Listesini Getir
+        /// <summary>
+        /// Tüm hammadde stok durumunu listeler.
+        /// </summary>
         public DataTable HammaddeleriGetir()
         {
             using (var con = Veritabani.BaglantiGetir())
@@ -21,12 +26,17 @@ namespace Fabrika_Otomasyonu
             }
         }
 
-        // 2. Akıllı Stok Ekleme (Varsa üzerine ekle, yoksa yeni oluştur)
+        /// <summary>
+        /// Stok Ekleme Mantığı:
+        /// - Malzeme veritabanında varsa üzerine ekler (UPDATE).
+        /// - Yoksa yeni kayıt oluşturur (INSERT).
+        /// </summary>
+        /// <param name="eklenecekMiktar">Eklenecek miktar (Negatif gönderilirse stok düşer)</param>
         public void HammaddeStokEkle(string tur, string birim, double eklenecekMiktar)
         {
             using (var con = Veritabani.BaglantiGetir())
             {
-                // A) Önce bu malzeme var mı diye kontrol et
+                // 1. Kontrol: Bu malzeme daha önce kaydedilmiş mi?
                 string kontrolSql = "SELECT Id, Miktar FROM Hammaddeler WHERE Tur=@tur";
                 int id = 0;
                 double mevcutMiktar = 0;
@@ -46,10 +56,9 @@ namespace Fabrika_Otomasyonu
                     }
                 }
 
-                // B) Duruma göre işlem yap
+                // 2. İşlem: Duruma göre güncelle veya ekle
                 if (kayitVarMi)
                 {
-                    // Varsa: Üstüne Ekle (UPDATE)
                     string updateSql = "UPDATE Hammaddeler SET Miktar=@yeniMiktar WHERE Id=@id";
                     using (var cmd = new SQLiteCommand(updateSql, con))
                     {
@@ -60,7 +69,6 @@ namespace Fabrika_Otomasyonu
                 }
                 else
                 {
-                    // Yoksa: Yeni Ekle (INSERT)
                     string insertSql = "INSERT INTO Hammaddeler (Tur, Birim, Miktar) VALUES (@tur, @birim, @miktar)";
                     using (var cmd = new SQLiteCommand(insertSql, con))
                     {
@@ -73,4 +81,4 @@ namespace Fabrika_Otomasyonu
             }
         }
     }
-}
+}   

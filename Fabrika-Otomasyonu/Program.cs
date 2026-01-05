@@ -1,25 +1,27 @@
 ﻿using System;
 using System.Windows.Forms;
-using DevExpress.Skins; // Skin yönetimi için gerekli
+using DevExpress.Skins;
 
 namespace Fabrika_Otomasyonu
 {
     static class Program
     {
+        /// <summary>
+        /// Uygulamanın ana giriş noktası.
+        /// </summary>
         [STAThread]
         static void Main()
         {
-            // BonusSkins satırını kaldırdım (DLL hatası vermemesi için)
-            // Standart temalar yine çalışacaktır.
+            // DevExpress Tema Ayarları
             SkinManager.EnableFormSkins();
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // DÜZELTME: Metodun yeni adı "TablolariKur"
+            // Veritabanı ve tabloların kurulumunu/kontrolünü yap
             Veritabani.TablolariKur();
 
-            // Login ekranını başlat
+            // Giriş ekranı ile uygulamayı başlat
             Application.Run(new LoginScreen());
         }
     }

@@ -4,23 +4,30 @@ using System.Data.SQLite;
 
 namespace Fabrika_Otomasyonu
 {
+    /// <summary>
+    /// Müşteri vitrin ekranında ürünlerin listelenmesi ve detaylarını yönetir.
+    /// </summary>
     public class VitrinYonetimi
     {
-        // 1. Vitrin Listesi (Kapak Resimli)
+        /// <summary>
+        /// Tüm ürünleri filtre olmadan getirir.
+        /// </summary>
         public DataTable VitrinListesiGetir()
         {
             return KategoriyeGoreGetir("Tümü");
         }
 
-        // 2. Kategori Filtreleme ve Listeleme
+        /// <summary>
+        /// Ürünleri kategorisine (Türü) göre filtreler.
+        /// Her ürünün ilk varyant resmini 'Kapak Resmi' olarak seçer.
+        /// </summary>
         public DataTable KategoriyeGoreGetir(string kategori)
         {
             using (var con = Veritabani.BaglantiGetir())
             {
                 string sql = "";
 
-                // Alt sorgu ile (SELECT ... LIMIT 1) her ürünün ilk varyant resmini 'KapakResmi' olarak çekiyoruz
-                // Ayrıca artık AnaHammadde (ürünün hammaddesi) alanını da getiriyoruz.
+                // Not: (SELECT ... LIMIT 1) alt sorgusu, ürüne ait ilk resmi kapak resmi yapar.
                 if (kategori == "Tümü")
                 {
                     sql = @"SELECT u.Id, u.ModelAd, u.Tur, u.Fiyat, u.AnaHammadde,
@@ -47,7 +54,9 @@ namespace Fabrika_Otomasyonu
             }
         }
 
-        // 3. SEÇİLEN ÜRÜNÜN DETAYLARI (RENK VE RESİMLER)
+        /// <summary>
+        /// Seçilen ürünün detay sayfasında göstermek üzere renk ve resim varyantlarını getirir.
+        /// </summary>
         public DataTable UrunDetaylariniGetir(int urunId)
         {
             using (var con = Veritabani.BaglantiGetir())

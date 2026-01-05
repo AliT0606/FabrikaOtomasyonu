@@ -2,17 +2,36 @@
 
 namespace Fabrika_Otomasyonu
 {
-    // Sepetteki her bir satırı temsil eder
+    /// <summary>
+    /// Sepete eklenen her bir ürün satırını temsil eden veri modeli.
+    /// </summary>
     public class SepetOgesi
     {
-        public int UrunId { get; set; }
-        public string ModelAd { get; set; }
-        public string Renk { get; set; }
-        public string AnaHammadde { get; set; }
-        public int TakimSayisi { get; set; } // Kaç takım?
-        public decimal BirimFiyat { get; set; } // 1 Takım Fiyatı
-        public decimal ToplamTutar { get; set; } // Takım * Adet
-        public Image UrunResmi { get; set; } // Listede gözükecek resim
+        public int UrunId { get; set; }// Ürünün Idsi 
+        public string ModelAd { get; set; }// Ürünün modeli
+        public string Renk { get; set; }// Ürünün Rengi
+        public string AnaHammadde { get; set; } // Ürünün ham maddesi 
+
+        /// <summary>
+        /// Sepette bu üründen kaç takım var?
+        /// </summary>
+        public int TakimSayisi { get; set; }
+
+        /// <summary>
+        /// Ürünün birim takım fiyatı.
+        /// </summary>
+        public decimal BirimFiyat { get; set; }
+
+        /// <summary>
+        /// Toplam Tutar = Birim Fiyat * Takım Sayısı
+        /// </summary>
+        public decimal ToplamTutar { get; set; }
+
+        public Image UrunResmi { get; set; } // Grid'de gösterilecek görsel
+
+        /// <summary>
+        /// Listelerde veya raporlarda kullanılacak özet metin.
+        /// </summary>
         public string TamBilgi
         {
             get
@@ -20,7 +39,5 @@ namespace Fabrika_Otomasyonu
                 return $"{ModelAd}\nRenk: {Renk}\nBirim Fiyat: {BirimFiyat:C2}";
             }
         }
-       
     }
-
 }

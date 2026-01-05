@@ -8,13 +8,24 @@ using System.Windows.Forms;
 
 namespace Fabrika_Otomasyonu
 {
+    /// <summary>
+    /// Sipariş oluşturma, listeleme, durum güncelleme ve stok/termin hesaplamalarını yöneten sınıf.
+    /// </summary>
     public class SiparisYonetimi
     {
-        // 1. SİPARİŞ LİSTESİ (YÖNETİCİ)
+        // =============================================================
+        // BÖLÜM 1: OKUMA İŞLEMLERİ (GETİR)
+        // =============================================================
+
+        /// <summary>
+        /// Yönetici ekranı için tüm siparişleri listeler.
+        /// Sıralama Önceliği: Onay Bekliyor > Hazırlanıyor > Diğerleri.
+        /// </summary>
         public DataTable SiparisleriGetir()
         {
             using (var con = Veritabani.BaglantiGetir())
             {
+                // CASE WHEN ile özel sıralama yapılıyor: Acil olanlar en üste.
                 string sql = @"SELECT * FROM Siparisler 
                                ORDER BY CASE 
                                    WHEN Durum = 'Onay Bekliyor' THEN 1 
@@ -30,12 +41,13 @@ namespace Fabrika_Otomasyonu
             }
         }
 
-        // 2. MÜŞTERİ SİPARİŞLERİ
+        /// <summary>
+        /// Belirli bir müşterinin sipariş geçmişini getirir (Müşteri Paneli).
+        /// </summary>
         public DataTable MusteriSiparisleriniGetir(string telefon)
         {
             using (var con = Veritabani.BaglantiGetir())
             {
-                // TahminiTarih sütununu da çekiyoruz
                 string sql = "SELECT UrunAdi, Adet, Tutar, Durum, TahminiTarih FROM Siparisler WHERE Telefon = @tel ORDER BY Id DESC";
                 using (var da = new SQLiteDataAdapter(sql, con))
                 {
@@ -47,7 +59,13 @@ namespace Fabrika_Otomasyonu
             }
         }
 
-        // 3. SİPARİŞ OLUŞTUR 
+        // =============================================================
+        // BÖLÜM 2: YAZMA İŞLEMLERİ (EKLE / GÜNCELLE)
+        // =============================================================
+
+        /// <summary>
+        /// Yeni bir sipariş kaydı oluşturur. Başlangıç durumu: 'Onay Bekliyor'.
+        /// </summary>
         public void SiparisOlustur(string musteriAdi, string telefon, string urunAdi, int adet, decimal birimFiyat, string adres, string siparisKodu)
         {
             using (var con = Veritabani.BaglantiGetir())
@@ -64,14 +82,16 @@ namespace Fabrika_Otomasyonu
                     cmd.Parameters.AddWithValue("@adet", adet);
                     cmd.Parameters.AddWithValue("@tutar", toplamTutar);
                     cmd.Parameters.AddWithValue("@adres", adres);
-                    cmd.Parameters.AddWithValue("@kod", siparisKodu); // <-- AYNI KOD KAYDEDİLİYOR
+                    cmd.Parameters.AddWithValue("@kod", siparisKodu);
                     cmd.Parameters.AddWithValue("@tarih", DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
                     cmd.ExecuteNonQuery();
                 }
             }
         }
 
-        // 4. DURUM GÜNCELLEME (Kargoya Verildi vs.)
+        /// <summary>
+        /// Tek bir siparişin durumunu günceller (Örn: Kargoya Verildi).
+        /// </summary>
         public void DurumDegistir(int id, string yeniDurum)
         {
             using (var con = Veritabani.BaglantiGetir())
@@ -86,13 +106,37 @@ namespace Fabrika_Otomasyonu
             }
         }
 
-        // 5. YÖNETİCİ ONAYI VE STOK DÜŞME (KRİTİK KISIM)
-        // --- GRUP BAZLI ONAY VE STOK DÜŞME ---
+        /// <summary>
+        /// Aynı sipariş koduna sahip (sepet mantığı) tüm ürünlerin durumunu toplu günceller.
+        /// </summary>
+        public void DurumDegistirGrup(string siparisKodu, string yeniDurum)
+        {
+            using (var con = Veritabani.BaglantiGetir())
+            {
+                string sql = "UPDATE Siparisler SET Durum=@durum WHERE SiparisKodu=@kod";
+                using (var cmd = new SQLiteCommand(sql, con))
+                {
+                    cmd.Parameters.AddWithValue("@durum", yeniDurum);
+                    cmd.Parameters.AddWithValue("@kod", siparisKodu);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        // =============================================================
+        // BÖLÜM 3: İŞ MANTIĞI (ONAY VE HESAPLAMALAR)
+        // =============================================================
+
+        /// <summary>
+        /// Siparişi onaylamadan önce stok kontrolü yapar. 
+        /// Yeterli hammadde varsa stoktan düşer ve durumu 'Hazırlanıyor' yapar.
+        /// </summary>
+        /// <returns>İşlem başarılıysa true, stok yetersizse false döner.</returns>
         public bool SiparisiOnaylaVeStokDus(string siparisKodu)
         {
             using (var con = Veritabani.BaglantiGetir())
             {
-                // 1. SİPARİŞTEKİ ÜRÜNLERİ ÇEK
+                // 1. Siparişteki ürünleri çek
                 string sqlSiparisler = "SELECT UrunAdi, Adet FROM Siparisler WHERE SiparisKodu=@kod";
                 DataTable dtUrunler = new DataTable();
                 using (var da = new SQLiteDataAdapter(sqlSiparisler, con))
@@ -101,8 +145,7 @@ namespace Fabrika_Otomasyonu
                     da.Fill(dtUrunler);
                 }
 
-                // 2. İHTİYAÇ LİSTESİNİ HESAPLA (Hangi maddeden ne kadar lazım?)
-                // Dictionary kullanıyoruz: "Hammadde Adı" -> "Gereken Miktar"
+                // 2. İhtiyaç listesini hesapla (Hangi maddeden ne kadar lazım?)
                 Dictionary<string, double> ihtiyacListesi = new Dictionary<string, double>();
 
                 foreach (DataRow row in dtUrunler.Rows)
@@ -128,15 +171,12 @@ namespace Fabrika_Otomasyonu
                         }
                     }
 
-                    // Miktar Hesapları (Senin verdiğin katsayılara göre)
-                    // Taban: Her çift için sabit (Örn: 16 birim)
+                    // Katsayı hesapları (Taban ve Deri/Kumaş)
                     double tabanGereken = adet * 16;
-
-                    // Deri: Türüne göre değişiyor (m2 veya birim hesabı)
                     double deriKatsayi = (tur == "Bot" ? 0.2 : (tur == "Spor" ? 0.15 : 0.1)) * 10;
                     double deriGereken = adet * deriKatsayi;
 
-                    // Listeye Ekle (Varsa üstüne topla, yoksa yeni ekle)
+                    // Listeye Ekle veya Güncelle
                     if (ihtiyacListesi.ContainsKey("Taban")) ihtiyacListesi["Taban"] += tabanGereken;
                     else ihtiyacListesi.Add("Taban", tabanGereken);
 
@@ -144,89 +184,48 @@ namespace Fabrika_Otomasyonu
                     else ihtiyacListesi.Add(anaHammadde, deriGereken);
                 }
 
-                // 3. STOK KONTROLÜ (Veritabanında yeterli mal var mı?)
+                // 3. Stok Kontrolü (Yeterli mi?)
                 string eksikMalzemeler = "";
                 bool stokYeterliMi = true;
 
                 foreach (var item in ihtiyacListesi)
                 {
-                    string hammaddeAdi = item.Key;
-                    double gerekenMiktar = item.Value;
-                    double mevcutStok = 0;
+                    double mevcutStok = StokMiktariGetir(con, item.Key); // Yardımcı metod kullanıldı
 
-                    using (var cmd = new SQLiteCommand("SELECT Miktar FROM Hammaddeler WHERE Tur=@tur", con))
-                    {
-                        cmd.Parameters.AddWithValue("@tur", hammaddeAdi);
-                        object sonuc = cmd.ExecuteScalar();
-                        if (sonuc != null) mevcutStok = Convert.ToDouble(sonuc);
-                    }
-
-                    // KONTROL ANI
-                    if (mevcutStok < gerekenMiktar)
+                    if (mevcutStok < item.Value)
                     {
                         stokYeterliMi = false;
-                        eksikMalzemeler += $"- {hammaddeAdi}: Mevcut {mevcutStok}, Gereken {gerekenMiktar}\n";
+                        eksikMalzemeler += $"- {item.Key}: Mevcut {mevcutStok}, Gereken {item.Value}\n";
                     }
                 }
 
-                // 4. KARAR ANI: EĞER EKSİK VARSA DUR!
+                // 4. Karar Anı
                 if (!stokYeterliMi)
                 {
-                    DevExpress.XtraEditors.XtraMessageBox.Show(
-                        "Bu siparişi onaylamak için yeterli hammadde yok!\n\nEksik Listesi:\n" + eksikMalzemeler,
-                        "Stok Yetersiz",
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Warning
-                    );
-                    return false; // İşlemi iptal et
+                    XtraMessageBox.Show("Yetersiz Stok!\n\n" + eksikMalzemeler, "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
                 }
 
-                // 5. STOK DÜŞME VE ONAYLAMA (Sadece stok yeterliyse buraya gelir)
+                // 5. Stok Düşme İşlemi (Commit)
                 foreach (var item in ihtiyacListesi)
                 {
-                    using (var cmd = new SQLiteCommand("UPDATE Hammaddeler SET Miktar = Miktar - @miktar WHERE Tur=@tur", con))
-                    {
-                        cmd.Parameters.AddWithValue("@miktar", item.Value);
-                        cmd.Parameters.AddWithValue("@tur", item.Key);
-                        cmd.ExecuteNonQuery();
-                    }
+                    StokGuncelle(con, item.Key, -item.Value); // Yardımcı metod ile çıkarma işlemi (negatif değer)
                 }
 
                 // Durumu güncelle
                 DurumDegistirGrup(siparisKodu, "Hazırlanıyor");
-
-                return true; // İşlem başarılı
+                return true;
             }
         }
 
-        // Yardımcı Metod: Stok Sorgula
-        private double StokMiktariGetir(SQLiteConnection con, string tur)
-        {
-            using (var cmd = new SQLiteCommand("SELECT Miktar FROM Hammaddeler WHERE Tur=@tur", con))
-            {
-                cmd.Parameters.AddWithValue("@tur", tur);
-                object result = cmd.ExecuteScalar();
-                return result != null ? Convert.ToDouble(result) : 0;
-            }
-        }
-
-        // Yardımcı Metod: Stok Güncelle (+ ekler, - çıkarır)
-        private void StokGuncelle(SQLiteConnection con, string tur, double miktar)
-        {
-            using (var cmd = new SQLiteCommand("UPDATE Hammaddeler SET Miktar = Miktar + @mik WHERE Tur=@tur", con))
-            {
-                cmd.Parameters.AddWithValue("@mik", miktar);
-                cmd.Parameters.AddWithValue("@tur", tur);
-                cmd.ExecuteNonQuery();
-            }
-        }
-        // --- SİPARİŞ KUYRUĞU VE TERMİN HESAPLAMA ---
-        // --- GRUP BAZLI AKILLI TARİH HESAPLAMA ---
+        /// <summary>
+        /// Tüm siparişlerin tahmini bitiş sürelerini, üretim sırası ve arıza durumlarına göre yeniden hesaplar.
+        /// </summary>
         public void TumTarihleriGuncelle()
         {
             using (var con = Veritabani.BaglantiGetir())
             {
-                // 1. Arıza Gecikmesi Var mı?
+                // 1. Arıza Bildirimi Kontrolü
                 int arizaGecikmesi = 0;
                 using (var cmd = new SQLiteCommand("SELECT Mesaj FROM Bildirimler WHERE AktifMi=1 AND Baslik LIKE '%Arıza%'", con))
                 {
@@ -240,36 +239,21 @@ namespace Fabrika_Otomasyonu
                     }
                 }
 
-                // 2. Bekleyen İşleri GRUPLU Çek
-                // Aynı sipariş koduna sahip ürünleri, ID sırasına göre getirir
+                // 2. Bekleyen işleri sırayla çek
                 string sql = @"SELECT S.Id, S.SiparisKodu, S.Adet, U.UretimGunu 
-                       FROM Siparisler S 
-                       JOIN Urunler U ON S.UrunAdi LIKE U.ModelAd || '%' 
-                       WHERE S.Durum IN ('Onay Bekliyor', 'Hazırlanıyor') 
-                       ORDER BY S.Id ASC";
+                               FROM Siparisler S 
+                               JOIN Urunler U ON S.UrunAdi LIKE U.ModelAd || '%' 
+                               WHERE S.Durum IN ('Onay Bekliyor', 'Hazırlanıyor') 
+                               ORDER BY S.Id ASC";
 
                 DataTable dt = new DataTable();
                 using (var da = new SQLiteDataAdapter(sql, con)) da.Fill(dt);
 
-                // 3. Hesaplama Motoru
+                // 3. Hesaplama Motoru Başlangıcı
                 DateTime hatBitisZamani = DateTime.Now;
                 if (arizaGecikmesi > 0) hatBitisZamani = hatBitisZamani.AddDays(arizaGecikmesi);
 
-                // Grupları takip etmek için
-                string suankiGrupKodu = "";
-                double grupToplamSure = 0;
-                DateTime grupBaslangicZamani = hatBitisZamani;
-
-                // -- ÖN HAZIRLIK: LİSTEYİ GRUPLARA AYIRIP TARİH DAĞITACAĞIZ --
-
-                // Bu kısımda mantığı basit tutuyoruz:
-                // Her satırı dön, o satırın süresini hesapla ve genel hatta ekle.
-                // FAKAT: Aynı gruptaki ürünlerin bitiş tarihi, grubun EN SONUNDAKİ tarih olmalı.
-
-                // Basit yöntem: Önce süreleri hesapla, sonra aynı koda sahip olanlara aynı tarihi bas.
-                // Ama sıra kaymaması lazım. Şöyle yapalım:
-
-                // Distinct (Benzersiz) Grup Kodlarını Sırayla Alalım
+                // Grupları (Sepetleri) ayıkla
                 var grupKodlari = dt.AsEnumerable()
                                     .Select(r => r["SiparisKodu"].ToString())
                                     .Distinct()
@@ -277,12 +261,10 @@ namespace Fabrika_Otomasyonu
 
                 foreach (string kod in grupKodlari)
                 {
-                    // Bu gruba ait satırları bul
                     var grupSatirlari = dt.Select($"SiparisKodu = '{kod}'");
-
                     double buGrubunToplamSuresi = 0;
 
-                    // Grubun toplam süresini hesapla
+                    // Bu sepetin toplam süresini bul
                     foreach (var row in grupSatirlari)
                     {
                         int adet = Convert.ToInt32(row["Adet"]);
@@ -290,17 +272,17 @@ namespace Fabrika_Otomasyonu
                         buGrubunToplamSuresi += (adet * birimSure);
                     }
 
-                    // Genel Hat Zamanını İlerlet
+                    // Genel hattı bu kadar ötele
                     hatBitisZamani = hatBitisZamani.AddDays(buGrubunToplamSuresi);
 
-                    // Bu gruptaki TÜM satırlara AYNI BİTİŞ TARİHİNİ yaz
+                    // Bu sepetteki TÜM ürünlere AYNI bitiş tarihini bas
                     foreach (var row in grupSatirlari)
                     {
                         int id = Convert.ToInt32(row["Id"]);
                         string updateSql = "UPDATE Siparisler SET TahminiTarih = @tarih WHERE Id = @id";
                         using (var cmd = new SQLiteCommand(updateSql, con))
                         {
-                            cmd.Parameters.AddWithValue("@tarih", hatBitisZamani); // Hepsi paket bitince gider
+                            cmd.Parameters.AddWithValue("@tarih", hatBitisZamani);
                             cmd.Parameters.AddWithValue("@id", id);
                             cmd.ExecuteNonQuery();
                         }
@@ -308,20 +290,30 @@ namespace Fabrika_Otomasyonu
                 }
             }
         }
-        // GRUP BAZLI DURUM GÜNCELLEME
-        public void DurumDegistirGrup(string siparisKodu, string yeniDurum)
+
+        // =============================================================
+        // BÖLÜM 4: YARDIMCI METODLAR (PRIVATE)
+        // =============================================================
+
+        private double StokMiktariGetir(SQLiteConnection con, string tur)
         {
-            using (var con = Veritabani.BaglantiGetir())
+            using (var cmd = new SQLiteCommand("SELECT Miktar FROM Hammaddeler WHERE Tur=@tur", con))
             {
-                // ID yerine SiparisKodu kullanıyoruz
-                string sql = "UPDATE Siparisler SET Durum=@durum WHERE SiparisKodu=@kod";
-                using (var cmd = new SQLiteCommand(sql, con))
-                {
-                    cmd.Parameters.AddWithValue("@durum", yeniDurum);
-                    cmd.Parameters.AddWithValue("@kod", siparisKodu);
-                    cmd.ExecuteNonQuery();
-                }
+                cmd.Parameters.AddWithValue("@tur", tur);
+                object result = cmd.ExecuteScalar();
+                return result != null ? Convert.ToDouble(result) : 0;
+            }
+        }
+
+        private void StokGuncelle(SQLiteConnection con, string tur, double miktar)
+        {
+            // Miktar pozitifse ekler, negatifse çıkarır
+            using (var cmd = new SQLiteCommand("UPDATE Hammaddeler SET Miktar = Miktar + @mik WHERE Tur=@tur", con))
+            {
+                cmd.Parameters.AddWithValue("@mik", miktar);
+                cmd.Parameters.AddWithValue("@tur", tur);
+                cmd.ExecuteNonQuery();
             }
         }
     }
-}   
+}
