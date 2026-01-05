@@ -102,7 +102,7 @@ namespace Fabrika_Otomasyonu
                     {
                         btn.Buttons[0].Caption = "KARGOLA";
                         btn.Buttons[0].Appearance.BackColor = Color.DarkOrange;
-                        btn.Buttons[0].Appearance.ForeColor = Color.White;
+                        btn.Buttons[0].Appearance.ForeColor = Color.Black;
                     }
                     else
                     {

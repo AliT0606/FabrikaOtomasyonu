@@ -183,7 +183,6 @@
             this.cmbKategoriFiltre.Properties.Items.AddRange(new object[] { "Tümü", "Bot", "Spor", "Klasik" });
             this.cmbKategoriFiltre.SelectedIndex = 0;
             this.cmbKategoriFiltre.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
-            this.cmbKategoriFiltre.Click += new System.EventHandler(this.cmbKategoriFiltre_Click);
 
             this.pnlKatalogSag.Dock = System.Windows.Forms.DockStyle.Right;
             this.pnlKatalogSag.Width = 320;
